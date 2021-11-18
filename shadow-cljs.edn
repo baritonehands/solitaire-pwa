@@ -1,0 +1,14 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[org.clojure/clojurescript "1.10.891"]]
+
+ :builds
+ {:desktop {:target     :browser
+            :asset-path "desktop"
+            :output-dir "desktop/build"
+            :modules    {:main {:init-fn solitaire.core/main}}}}}
