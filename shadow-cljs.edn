@@ -5,7 +5,9 @@
   "src/test"]
 
  :dependencies
- [[reagent "1.1.0"]]
+ [[reagent "1.1.0"]
+  [re-com "2.13.2"]
+  [re-frame "1.2.0"]]
 
  :dev-http
  {7777 "pwa"}

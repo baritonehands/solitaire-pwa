@@ -1,8 +1,9 @@
 (ns solitaire.core
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
-            [solitaire.components.card :as card]
-            [solitaire.deck :as deck]))
+            [re-frame.core :refer [dispatch dispatch-sync]]
+            [solitaire.deck.component :as deck]
+            [solitaire.events]))
 
 (defn register-worker []
   (if (js-in "serviceWorker" js/navigator)
@@ -20,19 +21,18 @@
     (println "ServiceWorker is not supported")))
 
 (defn app-component []
-  (let [deck (r/atom (deck/create))]
-    (fn []
-      [:<>
-       [:h2 "Solitaire"]
-       [:div
-        [:button {:type "button"
-                  :on-click (fn [] (swap! deck shuffle))}
-         "Shuffle"]]
-       [:div.deck
-        (for [[idx card] (map-indexed vector @deck)]
-          [card/view {:key  idx
-                      :card card}])]])))
+  [:<>
+   [:h2 "Solitaire"]
+   [:div
+    [:button {:type "button"
+              :on-click (fn [] (dispatch [:game/initialize]))}
+     "Reset"]]
+   [deck/view]])
+
+(defn ^:dev/after-load force-rerender []
+  (rdom/force-update-all))
 
 (defn main []
   (register-worker)
+  (dispatch-sync [:game/initialize])
   (rdom/render [app-component] (.getElementById js/document "app-container")))
