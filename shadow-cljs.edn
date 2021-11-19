@@ -19,7 +19,7 @@
             :asset-path "/assets/build"
             :output-dir "pwa/assets/build"
             :modules    {:shared {:entries []}
-                         :main   {:init-fn    solitaire.core/main
+                         :app    {:init-fn    solitaire.core/main
                                   :depends-on #{:shared}}
                          :worker {:init-fn    solitaire.worker.core/main
                                   :depends-on #{:shared}
