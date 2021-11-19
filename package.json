@@ -2,7 +2,14 @@
   "name": "solitaire-cp",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "desktop": "~/nwjs-sdk-v0.58.0-osx-x64/nwjs.app/Contents/MacOS/nwjs desktop/"
+  },
   "devDependencies": {
     "shadow-cljs": "2.16.4"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }
