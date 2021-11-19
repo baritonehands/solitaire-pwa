@@ -10,6 +10,9 @@
  :dev-http
  {7777 "pwa"}
 
+ :ssl
+ {}
+
  :builds
  {:desktop {:target     :browser
             :asset-path "desktop"

@@ -1,0 +1,13 @@
+.deck {
+  float: left;
+}
+
+.card {
+  border: 1px solid black;
+  border-radius: 10px;
+  float: left;
+  width: 75px;
+  height: 150px;
+  padding: 10px;
+  margin: 5px 5px;
+}
