@@ -4,4 +4,4 @@
 (reg-sub
   :settings
   (fn [db _]
-    (get-in db [:game :settings])))
+    (get-in db [:settings])))

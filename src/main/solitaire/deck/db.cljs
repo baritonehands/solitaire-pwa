@@ -5,5 +5,6 @@
   {:stock []
    :waste []
    :foundations []
-   :tableau []})
+   :tableau []
+   :dragging nil})
 

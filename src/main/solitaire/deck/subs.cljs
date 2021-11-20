@@ -4,4 +4,4 @@
 (reg-sub
   :deck
   (fn [db _]
-    (get-in db [:game :deck])))
+    (get-in db [:deck])))
