@@ -1,25 +1,35 @@
 (ns solitaire.deck.component
-  (:require [re-frame.core :refer [subscribe]]
+  (:require [re-frame.core :refer [subscribe dispatch]]
             [re-com.core :refer [box h-box v-box]]
             [solitaire.components.card :as card]))
 
 (defn stock-view [{:keys [stock]}]
   [box
    :size "1"
-   :child [card/face-down {} (count stock)]])
+   :child [card/face-down
+           {:on-click #(dispatch [:deck/draw])}
+           (count stock)]])
 
 (defn waste-view [{:keys [waste]}]
   [box
-   :size "1"
-   :child [card/blank]])
+   :size "2"
+   :child
+   (if (empty? waste)
+     [card/blank]
+     [h-box
+      :children
+      (for [[idx card] (map-indexed vector (take 3 waste))]
+        [box
+         :child [card/face-up {:key         idx
+                               :card        card
+                               :hz-stacked? (< idx 2)}]])])])
 
 (defn foundations-view [{:keys [foundations]}]
   [h-box
-   :size "5"
+   :size "4"
    :gap "5px"
    :children
-   [[box :size "1" :child ""]
-    [box :size "1" :child [card/blank]]
+   [[box :size "1" :child [card/blank]]
     [box :size "1" :child [card/blank]]
     [box :size "1" :child [card/blank]]
     [box :size "1" :child [card/blank]]]])
@@ -34,7 +44,7 @@
       :children
       (concat
         (for [[idx _] (map-indexed vector down)
-              :let [stacked? (or (< idx (count down))
+              :let [stacked? (or (< idx (dec (count down)))
                                  (seq up))]]
           [box
            :child [card/face-down {:key      idx

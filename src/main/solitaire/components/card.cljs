@@ -4,14 +4,19 @@
 (defn blank []
   [:div.card])
 
-(defn face-down [{:keys [stacked?]} & children]
+(defn face-down [{:keys [stacked? on-click]} & children]
   (into
     [:div.card
-     {:className (and stacked? "stacked")}]
+     {:className (cond-> ""
+                         stacked? (str " stacked")
+                         on-click (str " clickable"))
+      :on-click  on-click}]
     children))
 
 (defn face-up [{{:keys [rank suit]} :card
-                stacked?            :stacked?}]
+                :keys               [stacked? hz-stacked?]}]
   [:div.card
-   {:className (and stacked? "stacked")}
+   {:className (cond-> ""
+                       stacked? (str "stacked")
+                       hz-stacked? (str " hz-stacked"))}
    (str rank " of " suit)])

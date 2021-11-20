@@ -2,7 +2,7 @@
   (:require [re-frame.core :refer [path trim-v reg-event-db]]
             [solitaire.deck :as deck]))
 
-(def db-path (path :game :deck))
+(def deck-path (path :game :deck))
 
 (def tableau-size (reduce + (range 1 8)))
 
@@ -26,9 +26,29 @@
 
 (reg-event-db
   :deck/deal
-  [db-path]
+  [deck-path trim-v]
   deal-impl)
 
+(def game-path (path :game))
 
-
+(reg-event-db
+  :deck/draw
+  [game-path trim-v]
+  (fn [{:keys [settings] :as db} _]
+    (update
+      db
+      :deck
+      (fn [{:keys [stock waste] :as deck}]
+        (let [{:keys [num-cards]} settings
+              remaining (count stock)
+              to-take (min num-cards remaining)]
+          (if (zero? remaining)
+            (assoc deck
+              :stock (vec (reverse waste))
+              :waste [])
+            (assoc deck
+              :stock (drop to-take stock)
+              :waste (concat
+                       (take to-take stock)
+                       waste))))))))
 
