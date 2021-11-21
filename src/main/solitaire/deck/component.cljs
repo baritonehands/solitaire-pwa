@@ -19,11 +19,16 @@
      [card/blank]
      [h-box
       :children
-      (for [[idx card] (map-indexed vector (take 3 waste))]
+      (for [[idx card] (map-indexed vector (take 3 waste))
+            :let [size (count (take 3 waste))
+                  hz-stacked? (< idx (dec size))]]
         [box
-         :child [card/face-up {:key         idx
-                               :card        card
-                               :hz-stacked? (< idx 2)}]])])])
+         :child [card/face-up (cond-> {:key         idx
+                                       :card        card
+                                       :hz-stacked? hz-stacked?}
+                                      (= idx (dec size)) (assoc
+                                                           :on-drag-start [:deck/drag-start [:waste]]
+                                                           :on-drag-end   [:deck/drag-end]))]])])])
 
 (defn draggable-box []
   [box :size "1" :child [card/blank]])
@@ -33,10 +38,11 @@
    :size "4"
    :gap "5px"
    :children
-   [[drag/target [:foundations 0] :size "1" :child [card/blank]]
-    [drag/target [:foundations 1] :size "1" :child [card/blank]]
-    [drag/target [:foundations 2] :size "1" :child [card/blank]]
-    [drag/target [:foundations 3] :size "1" :child [card/blank]]]])
+   (for [idx (range 0 4)
+         :let [component (if-let [card (-> foundations (get idx) last)]
+                           [card/face-up {:card card}]
+                           [card/blank])]]
+     [drag/target [:foundations idx] :size "1" :child component])])
 
 (defn tableau-view [{:keys [tableau]}]
   [h-box
@@ -59,14 +65,15 @@
              :child [card/face-down {:key      idx
                                      :stacked? stacked?}]]
             [drag/target [:tableau pile :down]
-             :child [card/face-down {:key idx}]]))
+             :child [card/face-down {:key      idx
+                                     :on-click #(dispatch [:deck/draw-tableau pile])}]]))
         (for [[idx up-card] (map-indexed vector up)
               :let [stacked? (< idx (dec (count up)))]]
           (if stacked?
             [box
-             :child [card/face-up {:key           idx
-                                   :card          up-card
-                                   :stacked?      stacked?}]]
+             :child [card/face-up {:key      idx
+                                   :card     up-card
+                                   :stacked? true}]]
             [drag/target [:tableau pile :up]
              :child [card/face-up {:key           idx
                                    :card          up-card

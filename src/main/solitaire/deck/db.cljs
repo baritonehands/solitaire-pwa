@@ -2,9 +2,10 @@
   (:require [solitaire.deck.subs]))
 
 (def db
-  {:stock []
-   :waste []
+  {:stock       []
+   :waste       []
    :foundations []
-   :tableau []
-   :dragging nil})
+   :tableau     []
+   :dragging    nil
+   :droppable   nil})
 

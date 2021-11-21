@@ -1,6 +1,7 @@
 (ns solitaire.deck.events
   (:require [re-frame.core :refer [path trim-v reg-event-db]]
-            [solitaire.deck :as deck]))
+            [solitaire.deck :as deck]
+            [solitaire.deck.rules :as rules]))
 
 (def deck-path (path :deck))
 
@@ -49,8 +50,20 @@
             (assoc deck
               :stock (drop to-take stock)
               :waste (concat
-                       (take to-take stock)
+                       (reverse (take to-take stock))
                        waste))))))))
+
+(reg-event-db
+  :deck/draw-tableau
+  [deck-path trim-v]
+  (fn [deck [pile]]
+    (update-in
+      deck
+      [:tableau pile]
+      (fn [tableau]
+        (if-let [card (last (:down tableau))]
+          {:down (butlast (:down tableau))
+           :up   [card]})))))
 
 (reg-event-db
   :deck/drag-start
@@ -64,19 +77,41 @@
                             :pos  pos})
           (update-in card-path butlast)))))
 
+(def card-width 100)
+(def card-height 150)
+
+(defn center-in-rect? [[x y] {:keys [top right bottom left]}]
+  (let [cx (+ x (/ card-width 2))
+        cy (+ y (/ card-height 2))]
+    (and (>= cx left) (<= cx right)
+         (>= cy top) (<= cy bottom))))
+
+(defn droppable-target [[x y] targets]
+  (->> (for [[path dims] targets
+             :when (center-in-rect? [x y] dims)]
+         path)
+       (first)))
+
 (reg-event-db
   :deck/drag-move
-  [deck-path trim-v]
-  (fn [db [x y]]
-    (let [{:keys [card path]} (get db :dragging)]
-      (update db :dragging assoc :pos [x y]))))
+  [trim-v]                                                  ; Needs drag path too
+  (fn [{:keys [deck drag] :as db} [x y]]
+    (let [{{:keys [card path pos]} :dragging} deck
+          {:keys [targets]} drag]
+      (-> db
+          (update-in [:deck :dragging] assoc :pos [x y])
+          (assoc-in [:deck :droppable] (droppable-target pos targets))))))
 
 (reg-event-db
   :deck/drag-end
   [deck-path trim-v]
-  (fn [{:keys [dragging] :as db} _]
-    (let [{:keys [card path]} dragging]
-      (println dragging)
-      (-> db
-          (assoc :dragging nil)
-          (update-in path concat [card])))))
+  (fn [{:keys [dragging droppable] :as deck} _]
+    (let [{:keys [card path]} dragging
+          to-path (if (and droppable
+                           (rules/legal-target? card deck droppable))
+                    droppable
+                    path)]
+      (println dragging droppable)
+      (-> deck
+          (assoc :dragging nil :droppable nil)
+          (update-in to-path concat [card])))))

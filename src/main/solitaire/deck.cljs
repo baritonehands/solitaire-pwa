@@ -1,15 +1,15 @@
 (ns solitaire.deck)
 
 (def suits
-  ["Spades"
-   "Clubs"
-   "Diamonds"
-   "Hearts"])
+  ["Clubs"
+   "Spades"
+   "Hearts"
+   "Diamonds"])
 
 (def ranks
   (-> ["Ace"]
       (into (map str (range 2 11)))
-      (into ["Jack" "King" "Queen"])))
+      (into ["Jack" "Queen" "King"])))
 
 (defn create []
   (->> (for [suit suits
