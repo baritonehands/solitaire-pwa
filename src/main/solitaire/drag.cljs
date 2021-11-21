@@ -1,8 +1,8 @@
 (ns solitaire.drag
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
-            [re-com.core :refer [box]]
-            [re-frame.core :refer [dispatch]]))
+            [re-com.core :refer [box title]]
+            [re-frame.core :refer [dispatch subscribe]]))
 
 (defn mouse-down-handler
   ([pos event] (mouse-down-handler pos event {:invert? false
@@ -19,24 +19,27 @@
      e)))
 
 (defn target
-  "Automatically wrap component as drag target (must have single props map and vararg children)"
+  "Automatically wrap component as drag target (must pass box args)"
   [path & {:keys [child] :as args}]
   (r/with-let [*elem (r/atom nil)
+               *hover (subscribe [:deck/droppable])
                handler (fn []
                          (let [bounds (-> (.getBoundingClientRect @*elem)
                                           (.toJSON)
                                           (js->clj :keywordize-keys true))]
                            (dispatch [:drag/set-target path bounds])))
                _ (.addEventListener js/window "resize" handler)]
-    (vec
-      (reduce
-        concat
-        [box :child [:div {:ref (fn [elem]
-                                  (when elem
-                                    (reset! *elem elem)
-                                    (handler)))}
-                     child]]
-        (dissoc args :child)))
+    (-> args
+        (cond-> (= @*hover path) (assoc :class "droppable"))
+        (dissoc :child)
+        (->> (reduce
+               concat
+               [box :child [:div {:ref (fn [elem]
+                                         (when elem
+                                           (reset! *elem elem)
+                                           (handler)))}
+                            child]]))
+        (vec))
     (finally
       (.removeEventListener js/window "resize" handler)
       (dispatch [:drag/remove-target path]))))

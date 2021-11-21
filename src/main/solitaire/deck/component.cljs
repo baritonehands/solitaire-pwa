@@ -73,9 +73,19 @@
                                    :on-drag-start [:deck/drag-start [:tableau pile :up]]
                                    :on-drag-end   [:deck/drag-end]}]])))])])
 
+(defn overlay []
+  (if-let [{:keys [card pos]} @(subscribe [:deck/dragging])]
+    [box
+     :style {:left (first pos)
+             :top  (second pos)}
+     :class "drag-overlay"
+     :child [card/face-up {:card card}]]))
+
+
 (defn view []
   (let [{:keys [stock waste foundations tableau]} @(subscribe [:deck])]
     [v-box
+     :style {:overflow "visible"}
      :margin "10px"
      :gap "10px"
      :children

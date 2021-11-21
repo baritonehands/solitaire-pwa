@@ -37,5 +37,5 @@
                                                (.toJSON)
                                                (js->clj :keywordize-keys true)))))}
            (seq drag-opts) (assoc :on-mouse-down
-                                  (drag/mouse-down-handler [x y] println drag-opts)))
+                                  (drag/mouse-down-handler [x y] [:deck/drag-move] drag-opts)))
          (str rank " of " suit)]))))

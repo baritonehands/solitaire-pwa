@@ -6,6 +6,7 @@
 .card {
   border: 1px solid black;
   border-radius: 10px;
+  background-color: white;
   width: 100px;
   height: 150px;
   padding: 10px;
@@ -32,4 +33,12 @@
 
 .clickable {
   cursor: pointer;
+}
+
+.droppable .card {
+  border-color: red;
+}
+
+.drag-overlay {
+  position: absolute;
 }

@@ -27,9 +27,9 @@
           on-mouse-up (fn on-mouse-up [e]
                         (events/unlisten js/window EventType.MOUSEMOVE on-move)
                         (events/unlisten js/window EventType.MOUSEUP on-mouse-up)
-                        (if on-drag-start
+                        (if on-drag-end
                           (dispatch on-drag-end)))]
       (events/listen js/window EventType.MOUSEMOVE on-move)
       (events/listen js/window EventType.MOUSEUP on-mouse-up)
       (if on-drag-start
-        (dispatch on-drag-start)))))
+        (dispatch (conj on-drag-start start))))))

@@ -33,7 +33,7 @@
 
 (reg-event-db
   :deck/draw
-  [trim-v] ; Note no deck-path
+  [trim-v]                                                  ; Note no deck-path
   (fn [{:keys [settings] :as db} _]
     (update
       db
@@ -55,19 +55,28 @@
 (reg-event-db
   :deck/drag-start
   [deck-path trim-v]
-  (fn [db [card-path]]
+  (fn [db [card-path pos]]
     (let [stack (get-in db card-path)
           card (last stack)]
       (-> db
           (assoc :dragging {:card card
-                            :path card-path})
+                            :path card-path
+                            :pos  pos})
           (update-in card-path butlast)))))
+
+(reg-event-db
+  :deck/drag-move
+  [deck-path trim-v]
+  (fn [db [x y]]
+    (let [{:keys [card path]} (get db :dragging)]
+      (update db :dragging assoc :pos [x y]))))
 
 (reg-event-db
   :deck/drag-end
   [deck-path trim-v]
   (fn [{:keys [dragging] :as db} _]
     (let [{:keys [card path]} dragging]
+      (println dragging)
       (-> db
           (assoc :dragging nil)
           (update-in path concat [card])))))

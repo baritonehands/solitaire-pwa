@@ -1,8 +1,10 @@
 (ns solitaire.core
   (:require [reagent.core :as r]
             [reagent.dom :as rdom]
+            [re-com.core :refer [box h-box v-box title button]]
             [re-frame.core :refer [dispatch dispatch-sync]]
             [solitaire.deck.component :as deck]
+            [solitaire.drag :as drag]
             [solitaire.events]))
 
 (defn register-worker []
@@ -22,12 +24,22 @@
 
 (defn app-component []
   [:<>
-   [:h2 "Solitaire"]
-   [:div
-    [:button {:type "button"
-              :on-click (fn [] (dispatch [:game/initialize]))}
-     "Reset"]]
-   [deck/view]])
+   [v-box
+    :style {:position "relative"}
+    :children
+    [[h-box
+      :size "none"
+      :align :center
+      :gap "10px"
+      :children
+      [[box
+        :size "none"
+        :child [title :label "Solitaire" :level :level2]]
+       [box
+        :size "none"
+        :child [button :label "Reset" :on-click (fn [] (dispatch [:game/initialize]))]]]]
+     [box :size "auto" :child [deck/view]]]]
+   [deck/overlay]])
 
 (defn ^:dev/after-load force-rerender []
   (rdom/force-update-all))
