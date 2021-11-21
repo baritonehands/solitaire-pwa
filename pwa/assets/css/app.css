@@ -13,6 +13,11 @@
   font-size: 10px;
 }
 
+.card.blank {
+  border-color: #DDDDDD;
+  background-color: #DDDDDD;
+}
+
 .card.stacked {
   border-bottom: none;
   border-bottom-left-radius: 0;

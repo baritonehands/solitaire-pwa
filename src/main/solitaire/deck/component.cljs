@@ -1,8 +1,10 @@
 (ns solitaire.deck.component
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [re-com.core :refer [box h-box v-box]]
+            [re-com.core :refer [box h-box v-box label]]
             [solitaire.components.card :as card]
-            [solitaire.drag :as drag]))
+            [solitaire.drag :as drag]
+            [solitaire.deck :as deck]
+            [solitaire.deck.rules :as rules]))
 
 (defn stock-view [{:keys [stock]}]
   [box
@@ -17,21 +19,19 @@
    :child
    (if (empty? waste)
      [card/blank]
-     [h-box
-      :children
-      (for [[idx card] (map-indexed vector (take 3 waste))
-            :let [size (count (take 3 waste))
-                  hz-stacked? (< idx (dec size))]]
-        [box
-         :child [card/face-up (cond-> {:key         idx
-                                       :card        card
-                                       :hz-stacked? hz-stacked?}
-                                      (= idx (dec size)) (assoc
-                                                           :on-drag-start [:deck/drag-start [:waste]]
-                                                           :on-drag-end [:deck/drag-end]))]])])])
-
-(defn draggable-box []
-  [box :size "1" :child [card/blank]])
+     (let [cards (take-last 3 waste)]
+       [h-box
+        :children
+        (for [[idx card] (map-indexed vector cards)
+              :let [size (count cards)
+                    hz-stacked? (< idx (dec size))]]
+          [box
+           :child [card/face-up (cond-> {:key         idx
+                                         :card        card
+                                         :hz-stacked? hz-stacked?}
+                                        (= idx (dec size)) (assoc
+                                                             :on-drag-start [:deck/drag-start {:path [:waste]}]
+                                                             :on-drag-end [:deck/drag-end]))]])]))])
 
 (defn foundations-view [{:keys [foundations]}]
   [h-box
@@ -39,11 +39,15 @@
    :gap "5px"
    :children
    (for [idx (range 0 4)
-         :let [component (if-let [card (-> foundations (get idx) last)]
+         :let [suit (get deck/suits idx)
+               component (if-let [card (-> foundations (get idx) last)]
                            [card/face-up {:card          card
-                                          :on-drag-start [:deck/drag-start [:foundations idx]]
+                                          :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
                                           :on-drag-end   [:deck/drag-end]}]
-                           [card/blank])]]
+                           [card/blank
+                            [label
+                             :style {:color (rules/color suit)}
+                             :label suit]])]]
      [drag/target [:foundations idx] :size "1" :child component])])
 
 (defn tableau-view [{:keys [tableau]}]
@@ -73,22 +77,33 @@
               :let [stacked? (< idx (dec (count up)))]]
           (if stacked?
             [box
-             :child [card/face-up {:key      idx
-                                   :card     up-card
-                                   :stacked? true}]]
+             :child [card/face-up {:key           idx
+                                   :card          up-card
+                                   :stacked?      true
+                                   :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
+                                                                     :from-idx idx}]
+                                   :on-drag-end   [:deck/drag-end]}]]
             [drag/target [:tableau pile :up]
              :child [card/face-up {:key           idx
                                    :card          up-card
-                                   :on-drag-start [:deck/drag-start [:tableau pile :up]]
+                                   :on-drag-start [:deck/drag-start {:path [:tableau pile :up]}]
                                    :on-drag-end   [:deck/drag-end]}]])))])])
 
 (defn overlay []
-  (if-let [{:keys [card pos]} @(subscribe [:deck/dragging])]
+  (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]
     [box
      :style {:left (first pos)
              :top  (second pos)}
      :class "drag-overlay"
-     :child [card/face-up {:card card}]]))
+     :child [v-box
+             :size "1 0 auto"
+             :children
+             (for [[idx card] (map-indexed vector cards)
+                   :let [stacked? (< idx (dec (count cards)))]]
+               [box
+                :child [card/face-up {:key      idx
+                                      :card     card
+                                      :stacked? stacked?}]])]]))
 
 
 (defn view []

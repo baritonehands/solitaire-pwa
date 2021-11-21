@@ -22,8 +22,9 @@
       (let [dir (last drop-path)]
         (case dir
           :down false
-          :up (and (not= (color suit) (color (:suit last-card)))
-                   (= (rank->idx rank) (dec (rank->idx (:rank last-card)))))))
+          :up (or (and (nil? last-card) (= rank "King"))
+                  (and (not= (color suit) (color (:suit last-card)))
+                       (= (rank->idx rank) (dec (rank->idx (:rank last-card))))))))
 
       :foundations
       (and (= (suit->idx suit) (second drop-path))

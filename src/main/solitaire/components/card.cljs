@@ -2,10 +2,11 @@
   (:require [reagent.core :as r]
             [re-com.core :refer [box]]
             [solitaire.drag :as drag]
-            [solitaire.utils :as utils]))
+            [solitaire.utils :as utils]
+            [solitaire.deck.rules :as rules]))
 
-(defn blank []
-  [:div.card])
+(defn blank [& children]
+  (into [:div.card.blank] children))
 
 (defn face-down [{:keys [stacked? on-click]} & children]
   (into
@@ -31,9 +32,7 @@
            {:className (cond-> ""
                                stacked? (str "stacked")
                                hz-stacked? (str " hz-stacked"))
-            :style     {:color (case suit
-                                 ("Clubs" "Spades") "black"
-                                 "red")}
+            :style     {:color (rules/color suit)}
             :ref       (fn [el]
                          (when el
                            (reset! *bounds (-> (.getBoundingClientRect el)
