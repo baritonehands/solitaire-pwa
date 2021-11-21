@@ -28,7 +28,7 @@
                                        :hz-stacked? hz-stacked?}
                                       (= idx (dec size)) (assoc
                                                            :on-drag-start [:deck/drag-start [:waste]]
-                                                           :on-drag-end   [:deck/drag-end]))]])])])
+                                                           :on-drag-end [:deck/drag-end]))]])])])
 
 (defn draggable-box []
   [box :size "1" :child [card/blank]])
@@ -40,7 +40,9 @@
    :children
    (for [idx (range 0 4)
          :let [component (if-let [card (-> foundations (get idx) last)]
-                           [card/face-up {:card card}]
+                           [card/face-up {:card          card
+                                          :on-drag-start [:deck/drag-start [:foundations idx]]
+                                          :on-drag-end   [:deck/drag-end]}]
                            [card/blank])]]
      [drag/target [:foundations idx] :size "1" :child component])])
 

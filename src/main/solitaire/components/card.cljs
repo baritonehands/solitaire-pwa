@@ -31,6 +31,9 @@
            {:className (cond-> ""
                                stacked? (str "stacked")
                                hz-stacked? (str " hz-stacked"))
+            :style     {:color (case suit
+                                 ("Clubs" "Spades") "black"
+                                 "red")}
             :ref       (fn [el]
                          (when el
                            (reset! *bounds (-> (.getBoundingClientRect el)
