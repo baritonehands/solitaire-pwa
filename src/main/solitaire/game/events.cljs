@@ -7,4 +7,6 @@
   [trim-v]
   (fn [_ _]
     {:db       app-db
-     :dispatch [:deck/deal]}))
+     :dispatch-n [[:drag/init]
+                  [:deck/deal]]}))
+

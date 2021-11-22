@@ -5,6 +5,12 @@
 (def db-path (path :drag))
 
 (reg-event-fx
+  :drag/init
+  [db-path trim-v]
+  (fn [_ _]
+    {:drag.fx/init true}))
+
+(reg-event-fx
   :drag/start
   [db-path trim-v]
   (fn [_ [opts]]

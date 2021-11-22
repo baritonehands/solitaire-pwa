@@ -1,5 +1,8 @@
 body {
   background-color: #008000;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  overflow: hidden;
 }
 
 #app-container {
@@ -11,6 +14,7 @@ body {
   border: 1px solid black;
   border-radius: 8px;
   background-color: white;
+  cursor: pointer;
   width: 100px;
   height: 150px;
   padding: 0 5px;
@@ -64,10 +68,10 @@ body {
   font-family: serif;
   font-size: 14px;
   font-weight: bold;
-  cursor: default;
+  cursor: pointer;
 }
 
-.corner-suit img {
+.corner-suit-image {
   width: 12px;
   height: 12px;
 }

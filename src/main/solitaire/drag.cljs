@@ -4,22 +4,31 @@
             [re-com.core :refer [box title]]
             [re-frame.core :refer [dispatch subscribe]]))
 
-(def double-click-duration 500)
-
 (defn mouse-down-handler
-  ([pos event] (mouse-down-handler pos event {:invert? false
-                                              :scale   1}))
-  ([[x y] event opts]
+  ([*elem event] (mouse-down-handler event {:invert? false
+                                            :scale   1}))
+  ([*elem event opts]
    (fn [e]
-     (when (zero? (.-button e))
-       (dispatch [:drag/start {:offset [(.-clientX e)
-                                        (.-clientY e)]
-                               :start  [x y]
-                               :opts   opts
-                               :event  event}])
-       (.stopPropagation e)
-       (.preventDefault e)
-       e))))
+     (when (and
+             (= (.-target e) @*elem)
+             (or (= (.-type e) "touchstart")
+                 (zero? (.-button e))))
+       (let [dims (case (.-type e)
+                    "touchstart" (aget e "targetTouches" 0)
+                    e)
+             {:keys [x y]} (-> (.getBoundingClientRect @*elem)
+                               (.toJSON)
+                               (js->clj :keywordize-keys true))]
+         (println "dispatching start" [x y] [(.-clientX dims)
+                                             (.-clientY dims)])
+         (dispatch [:drag/start {:offset [(.-clientX dims)
+                                          (.-clientY dims)]
+                                 :start  [x y]
+                                 :opts   opts
+                                 :event  event}])
+         (.stopPropagation e)
+         (.preventDefault e)
+         e)))))
 
 (defn target
   "Automatically wrap component as drag target (must pass box args)"
