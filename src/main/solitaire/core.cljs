@@ -14,7 +14,7 @@
                          (..
                            js/navigator
                            -serviceWorker
-                           (register "/assets/build/worker.js")
+                           (register "assets/build/worker.js")
                            (then
                              (fn [_]
                                (println "Registered!"))

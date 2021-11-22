@@ -61,5 +61,5 @@
             [box
              :size "none"
              :class "corner-suit"
-             :child [:img {:src (str "/assets/images/" (.toLowerCase suit) ".svg")
+             :child [:img {:src (str "assets/images/" (.toLowerCase suit) ".svg")
                            :alt suit}]]]]]]))))
