@@ -4,6 +4,7 @@
 
     npm install
     npm link shadow-cljs
+    shadow-cljs pom
 
 ## Run Dev Build
 
