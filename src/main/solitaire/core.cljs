@@ -34,7 +34,7 @@
       :children
       [[box
         :size "none"
-        :child [title :label "Solitaire" :level :level2]]
+        :child [title :label "Solitaire" :level :level2 :style {:color "white"}]]
        [box
         :size "none"
         :child [button :label "Reset" :on-click (fn [] (dispatch [:game/initialize]))]]]]

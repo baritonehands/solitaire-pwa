@@ -3,8 +3,8 @@
 
 (defn color [suit]
   (case suit
-    ("Clubs" "Spades") :black
-    :red))
+    ("Clubs" "Spades") "black"
+    "#d40000"))
 
 (def rank->idx
   (->> (map vector deck/ranks (range))

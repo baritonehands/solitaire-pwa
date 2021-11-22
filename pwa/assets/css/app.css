@@ -1,3 +1,7 @@
+body {
+  background-color: #008000;
+}
+
 #app-container {
   max-width: 900px;
   margin: 0 auto;
@@ -5,26 +9,41 @@
 
 .card {
   border: 1px solid black;
-  border-radius: 10px;
+  border-radius: 8px;
   background-color: white;
   width: 100px;
   height: 150px;
-  padding: 10px;
+  padding: 0 5px;
   font-size: 10px;
+  background-repeat: no-repeat;
+  background-position: 25px 50px;
+  background-size: 50px 50px;
 }
 
 .card.blank {
-  border-color: #DDDDDD;
-  background-color: #DDDDDD;
+  border-color: #666666;
+  background-color: #AAAAAA;
+  opacity: 50%;
+}
+
+.back {
+  background-image: url(../images/back.jpeg);
+  background-repeat: no-repeat;
+  background-position: 7px 7px;
+  background-size: 85px 135px;
 }
 
 .card.stacked {
   border-bottom: none;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  height: 30px;
+  height: 40px;
   margin-bottom: -5px;
   padding-bottom: 15px;
+}
+
+.card.stacked.back {
+  height: 20px;
 }
 
 .card.hz-stacked {
@@ -34,6 +53,38 @@
   width: 33px;
   margin-right: -5px;
   padding-right: 15px;
+}
+
+.corner {
+  width: 16px;
+  margin-top: 5px;
+}
+
+.corner-label {
+  font-family: serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.corner-suit img {
+  width: 12px;
+  height: 12px;
+}
+
+.spades {
+  background-image: url(../images/spades.svg);
+}
+
+.clubs {
+  background-image: url(../images/clubs.svg);
+}
+
+.hearts {
+  background-image: url(../images/hearts.svg);
+}
+
+.diamonds {
+  background-image: url(../images/diamonds.svg);
 }
 
 .clickable {
