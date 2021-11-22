@@ -66,6 +66,19 @@
            :up   [card]})))))
 
 (reg-event-db
+  :deck/draw-shortcut
+  [deck-path trim-v]
+  (fn [deck [path]]
+    (let [stack (get-in deck path)
+          {:keys [rank suit] :as card} (last stack)
+          drop-path [:foundations (rules/suit->idx suit)]]
+      (if (rules/legal-target? card deck drop-path)
+        (-> deck
+            (update-in path butlast)
+            (update-in drop-path concat [card]))
+        deck))))
+
+(reg-event-db
   :deck/drag-start
   [deck-path trim-v]
   (fn [db [{:keys [path from-idx]} pos]]
@@ -112,7 +125,6 @@
                            (rules/legal-target? (first cards) deck droppable))
                     droppable
                     path)]
-      (println dragging droppable)
       (-> deck
           (assoc :dragging nil :droppable nil)
           (update-in to-path concat cards)))))

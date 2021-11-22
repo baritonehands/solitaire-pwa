@@ -19,7 +19,7 @@
    :size "2"
    :child
    (if (empty? waste)
-     [card/blank] 
+     [card/blank]
      (let [cards (take-last 3 waste)]
        [h-box
         :children
@@ -57,7 +57,8 @@
       :children
       (concat
         (if (and (empty? down) (empty? up))
-          [[drag/target [:tableau pile :up]
+          [^{:key "empty"}
+           [drag/target [:tableau pile :up]
             :child [card/blank]]]
           [])
         (for [[idx _] (map-indexed vector down)
@@ -66,6 +67,7 @@
           (if stacked?
             [box
              :child [card/face-down {:stacked? stacked?}]]
+            ^{:key (str "down" idx)}
             [drag/target [:tableau pile :down]
              :child [card/face-down {:on-click #(dispatch [:deck/draw-tableau pile])}]]))
         (for [[idx up-card] (map-indexed vector up)
@@ -77,10 +79,14 @@
                                    :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
                                                                      :from-idx idx}]
                                    :on-drag-end   [:deck/drag-end]}]]
+            ^{:key (str "up" idx)}
             [drag/target [:tableau pile :up]
-             :child [card/face-up {:card          up-card
-                                   :on-drag-start [:deck/drag-start {:path [:tableau pile :up]}]
-                                   :on-drag-end   [:deck/drag-end]}]])))])])
+             :child [card/face-up {:card            up-card
+                                   :on-drag-start   [:deck/drag-start {:path [:tableau pile :up]}]
+                                   :on-drag-end     [:deck/drag-end]
+                                   :on-double-click (fn [_]
+                                                      (println "Double Click!")
+                                                      (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]])))])])
 
 (defn overlay []
   (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]
