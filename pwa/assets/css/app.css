@@ -1,121 +1,122 @@
 body {
-  background-color: #008000;
-  -webkit-touch-callout: none !important;
-  -webkit-user-select: none !important;
+    background-color: #008000;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
 }
 
 #app-container {
-  max-width: 900px;
-  margin: 0 auto;
+    min-width: 750px;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .card {
-  border: 1px solid black;
-  border-radius: 8px;
-  background-color: white;
-  cursor: pointer;
-  width: 100px;
-  height: 150px;
-  padding: 0 5px;
-  font-size: 10px;
-  background-repeat: no-repeat;
-  background-position: 25px 50px;
-  background-size: 50px 50px;
+    border: 1px solid black;
+    border-radius: 8px;
+    background-color: white;
+    cursor: pointer;
+    width: 100px;
+    height: 150px;
+    padding: 0 5px;
+    font-size: 10px;
+    background-repeat: no-repeat;
+    background-position: 25px 50px;
+    background-size: 50px 50px;
 }
 
 .card.blank {
-  border-color: #666666;
-  background-color: #AAAAAA;
-  opacity: 50%;
+    border-color: #666666;
+    background-color: #AAAAAA;
+    opacity: 50%;
 }
 
 .back {
-  background-image: url(../images/back.jpeg);
-  background-repeat: no-repeat;
-  background-position: 7px 7px;
-  background-size: 85px 135px;
+    background-image: url(../images/back.jpeg);
+    background-repeat: no-repeat;
+    background-position: 7px 7px;
+    background-size: 85px 135px;
 }
 
 .card.stacked {
-  border-bottom: none;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  height: 40px;
-  margin-bottom: -5px;
-  padding-bottom: 15px;
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 40px;
+    margin-bottom: -5px;
+    padding-bottom: 15px;
 }
 
 .card.stacked.back {
-  height: 20px;
+    height: 20px;
 }
 
 .card.hz-stacked {
-  border-right: none;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  width: 33px;
-  margin-right: -5px;
-  padding-right: 15px;
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 33px;
+    margin-right: -5px;
+    padding-right: 15px;
 }
 
 .corner {
-  width: 16px;
-  margin-top: 5px;
+    width: 16px;
+    margin-top: 5px;
 }
 
 .corner-label {
-  font-family: serif;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
+    font-family: serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .corner-suit-image {
-  width: 12px;
-  height: 12px;
+    width: 12px;
+    height: 12px;
 }
 
 .spades {
-  background-image: url(../images/spades.svg);
+    background-image: url(../images/spades.svg);
 }
 
 .clubs {
-  background-image: url(../images/clubs.svg);
+    background-image: url(../images/clubs.svg);
 }
 
 .hearts {
-  background-image: url(../images/hearts.svg);
+    background-image: url(../images/hearts.svg);
 }
 
 .diamonds {
-  background-image: url(../images/diamonds.svg);
+    background-image: url(../images/diamonds.svg);
 }
 
 .clickable {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .droppable .card {
-  border-color: goldenrod;
+    border-color: goldenrod;
 }
 
 .drag-overlay {
-  position: absolute;
+    position: absolute;
 }
 
 .hidden {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 .foundation-stack {
-  position: relative;
+    position: relative;
 }
 
 .foundation-stack > * {
-  width: 150px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+    width: 150px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
