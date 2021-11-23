@@ -90,7 +90,6 @@
                             :path  path
                             :idx   idx
                             :pos   pos})))))
-          ;(update-in path #(take idx %))))))
 
 (def card-width 100)
 (def card-height 150)

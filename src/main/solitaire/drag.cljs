@@ -26,8 +26,6 @@
                                  :start  [x y]
                                  :opts   opts
                                  :event  event}])
-         (.stopPropagation e)
-         (.preventDefault e)
          e)))))
 
 (defn target

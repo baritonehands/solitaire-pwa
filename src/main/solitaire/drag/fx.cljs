@@ -3,11 +3,15 @@
             [goog.events :as events])
   (:import [goog.events EventType]))
 
+(defn prevent-pointer-events [e]
+  (when (= (-> e .-target .-style .-cursor) "pointer")
+    (.preventDefault e)))
+
 (reg-fx
   :drag.fx/init
   (fn [_]
-    (events/listen js/document EventType.TOUCHMOVE #(.preventDefault %) #js {:passive false})
-    (events/listen js/document "touchforcechange" #(.preventDefault %) #js {:passive false})))
+    (events/listen js/document EventType.TOUCHMOVE prevent-pointer-events #js {:passive false})
+    (events/listen js/document "touchforcechange" prevent-pointer-events #js {:passive false})))
 
 (defn scale [n px]
   (int (/ n px)))
