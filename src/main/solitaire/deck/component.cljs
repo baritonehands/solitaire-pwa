@@ -48,45 +48,64 @@
      [drag/target [:foundations idx] :size "1" :child component])])
 
 (defn tableau-view [{:keys [tableau]}]
-  [h-box
-   :gap "5px"
-   :children
-   (for [[pile {:keys [down up]}] (map-indexed vector tableau)]
-     [v-box
-      :size "1 0 auto"
-      :children
-      (concat
-        (if (and (empty? down) (empty? up))
-          [^{:key "empty"}
-           [drag/target [:tableau pile :up]
-            :child [card/blank]]]
-          [])
-        (for [[idx _] (map-indexed vector down)
-              :let [stacked? (or (< idx (dec (count down)))
-                                 (seq up))]]
-          (if stacked?
-            [box
-             :child [card/face-down {:stacked? stacked?}]]
-            ^{:key (str "down" idx)}
-            [drag/target [:tableau pile :down]
-             :child [card/face-down {:on-click #(dispatch [:deck/draw-tableau pile])}]]))
-        (for [[idx up-card] (map-indexed vector up)
-              :let [stacked? (< idx (dec (count up)))]]
-          (if stacked?
-            [box
-             :child [card/face-up {:card          up-card
-                                   :stacked?      true
-                                   :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
-                                                                     :from-idx idx}]
-                                   :on-drag-end   [:deck/drag-end]}]]
-            ^{:key (str "up" idx)}
-            [drag/target [:tableau pile :up]
-             :child [card/face-up {:card            up-card
-                                   :on-drag-start   [:deck/drag-start {:path [:tableau pile :up]}]
-                                   :on-drag-end     [:deck/drag-end]
-                                   :on-double-click (fn [_]
-                                                      (println "Double Click!")
-                                                      (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]])))])])
+  (let [dragging @(subscribe [:deck/dragging])]
+    [h-box
+     :gap "5px"
+     :children
+     (for [[pile {:keys [down up]}] (map-indexed vector tableau)
+           :let [{dragging-path  :path
+                  dragging-cards :cards
+                  dragging-idx   :idx} dragging
+                 drag-source? (= [:tableau pile :up] dragging-path)]]
+       [v-box
+        :size "1 0 auto"
+        :children
+        (concat
+          (if (and (empty? down)
+                   (or
+                     (empty? up)
+                     (and drag-source? (= (count up) (count dragging-cards)))))
+            [^{:key "empty"}
+             [drag/target [:tableau pile :up]
+              :child [card/blank]]]
+            [])
+          (for [[idx _] (map-indexed vector down)
+                :let [last? (and (empty? up)
+                                 (= idx (dec (count down))))
+                      stacked? (or (< idx (dec (count down)))
+                                   (if drag-source?
+                                     (< (count dragging-cards) (count up))
+                                     (seq up)))]]
+            (if last?
+              ^{:key (str "down" idx)}
+              [drag/target [:tableau pile :down]
+               :child [card/face-down {:on-click #(dispatch [:deck/draw-tableau pile])}]]
+              [box
+               :child [card/face-down {:stacked? stacked?}]]))
+          (for [[idx up-card] (map-indexed vector up)
+                :let [last? (= idx (dec (count up)))
+                      stacked? (if drag-source?
+                                 (< idx (dec dragging-idx))
+                                 (not last?))
+                      hidden? (and drag-source?
+                                   (>= idx dragging-idx))]]
+            (if last?
+              ^{:key (str "up" idx)}
+              [drag/target [:tableau pile :up]
+               :child [card/face-up {:card            up-card
+                                     :hidden?         hidden?
+                                     :on-drag-start   [:deck/drag-start {:path [:tableau pile :up]}]
+                                     :on-drag-end     [:deck/drag-end]
+                                     :on-double-click (fn [_]
+                                                        (println "Double Click!")
+                                                        (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]
+              [box
+               :child [card/face-up {:card          up-card
+                                     :stacked?      stacked?
+                                     :hidden?       hidden?
+                                     :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
+                                                                       :from-idx idx}]
+                                     :on-drag-end   [:deck/drag-end]}]])))])]))
 
 (defn overlay []
   (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]

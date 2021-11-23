@@ -2,7 +2,6 @@ body {
   background-color: #008000;
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
-  overflow: hidden;
 }
 
 #app-container {
@@ -102,4 +101,8 @@ body {
 
 .drag-overlay {
   position: absolute;
+}
+
+.hidden {
+  visibility: hidden;
 }

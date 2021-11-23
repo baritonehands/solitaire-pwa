@@ -6,7 +6,6 @@
 (reg-fx
   :drag.fx/init
   (fn [_]
-    (println "Disabling touch move")
     (events/listen js/document EventType.TOUCHMOVE #(.preventDefault %) #js {:passive false})
     (events/listen js/document "touchforcechange" #(.preventDefault %) #js {:passive false})))
 
@@ -27,10 +26,8 @@
 (reg-fx
   :drag.fx/start
   (fn [{:keys [offset start event opts]}]
-    (println "drag start")
     (let [{:keys [on-drag-start on-drag-end]} opts
           on-move (fn [e]
-                    (println "moved" (.-type e))
                     (event-or-fn event (new-pos offset start e opts))
                     (.stopPropagation e)
                     (.preventDefault e))

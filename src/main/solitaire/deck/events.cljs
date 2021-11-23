@@ -88,8 +88,9 @@
       (-> db
           (assoc :dragging {:cards cards
                             :path  path
-                            :pos   pos})
-          (update-in path #(take idx %))))))
+                            :idx   idx
+                            :pos   pos})))))
+          ;(update-in path #(take idx %))))))
 
 (def card-width 100)
 (def card-height 150)
@@ -127,4 +128,5 @@
                     path)]
       (-> deck
           (assoc :dragging nil :droppable nil)
+          (update-in (:path dragging) #(take (:idx dragging) %))
           (update-in to-path concat cards)))))

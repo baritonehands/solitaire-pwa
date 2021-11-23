@@ -23,7 +23,7 @@
     (first rank)))
 
 (defn face-up [{{:keys [rank suit]} :card
-                :keys               [stacked? hz-stacked? on-drag-start on-drag-end]}]
+                :keys               [hidden? stacked? hz-stacked? on-drag-start on-drag-end]}]
   (r/with-let [*elem (atom nil)
                drag-opts (cond->
                            {}
@@ -35,6 +35,7 @@
     [:div.card
      (cond->
        {:className (cond-> (.toLowerCase suit)
+                           hidden? (str " hidden")
                            stacked? (str " stacked")
                            hz-stacked? (str " hz-stacked"))
         :ref (fn [el]
