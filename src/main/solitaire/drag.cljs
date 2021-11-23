@@ -19,11 +19,10 @@
              {:keys [x y]} (-> (.getBoundingClientRect @*elem)
                                (.toJSON)
                                (js->clj :keywordize-keys true))]
-         (println "dispatching start" [x y] [(.-clientX dims)
-                                             (.-clientY dims)])
          (dispatch [:drag/start {:offset [(.-clientX dims)
                                           (.-clientY dims)]
-                                 :start  [x y]
+                                 :start  [(+ x js/window.scrollX)
+                                          (+ y js/window.scrollY)]
                                  :opts   opts
                                  :event  event}])
          e)))))
@@ -33,25 +32,25 @@
   [path & {:keys [child] :as args}]
   (r/with-let [*elem (r/atom nil)
                *hover (subscribe [:deck/droppable])
-               handler (fn []
+               handler (fn [e]
                          (let [bounds (-> (.getBoundingClientRect @*elem)
                                           (.toJSON)
                                           (js->clj :keywordize-keys true))]
                            (dispatch [:drag/set-target path bounds])))
                _ (.addEventListener js/window "resize" handler)]
-    (-> args
-        (cond-> (= @*hover path) (assoc :class "droppable"))
-        (dissoc :child)
-        (->> (reduce
-               concat
-               [box :child [:div {:ref (fn [elem]
-                                         (when elem
-                                           (reset! *elem elem)
-                                           (handler)))}
-                            child]]))
-        (vec))
-    (finally
-      (.removeEventListener js/window "resize" handler)
-      (dispatch [:drag/remove-target path]))))
+              (-> args
+                  (cond-> (= @*hover path) (assoc :class "droppable"))
+                  (dissoc :child)
+                  (->> (reduce
+                         concat
+                         [box :child [:div {:ref (fn [elem]
+                                                   (when elem
+                                                     (reset! *elem elem)
+                                                     (handler #js {})))}
+                                      child]]))
+                  (vec))
+              (finally
+                (.removeEventListener js/window "resize" handler)
+                (dispatch [:drag/remove-target path]))))
 
 

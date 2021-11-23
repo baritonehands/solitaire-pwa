@@ -38,8 +38,9 @@
                                                                            :on-drag-end [:deck/drag-end]))]])]
          [h-box
           :children
-          (if (and drag-source? (= size 1))
-            (cons [card/blank] children)
+          (cons
+            (if (and drag-source? (= size 1))
+              [card/blank])
             children)]))]))
 
 (defn foundations-view [{:keys [foundations]}]
@@ -87,14 +88,13 @@
         :size "1 0 auto"
         :children
         (concat
-          (if (and (empty? down)
-                   (or
-                     (empty? up)
-                     (and drag-source? (= (count up) (count dragging-cards)))))
-            [^{:key "empty"}
+          [(if (and (empty? down)
+                    (or
+                      (empty? up)
+                      (and drag-source? (= (count up) (count dragging-cards)))))
+             ^{:key "empty"}
              [drag/target [:tableau pile :up]
-              :child [card/blank]]]
-            [])
+              :child [card/blank]])]
           (for [[idx _] (map-indexed vector down)
                 :let [last? (and (empty? up)
                                  (= idx (dec (count down))))

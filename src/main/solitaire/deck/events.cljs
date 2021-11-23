@@ -102,7 +102,8 @@
 
 (defn droppable-target [[x y] targets]
   (->> (for [[path dims] targets
-             :when (center-in-rect? [x y] dims)]
+             :when (center-in-rect? [(- x js/window.scrollX)
+                                     (- y js/window.scrollY)] dims)]
          path)
        (first)))
 
