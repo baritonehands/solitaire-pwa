@@ -5,8 +5,10 @@
             [solitaire.utils :as utils]
             [solitaire.deck.rules :as rules]))
 
-(defn blank [& [props]]
-  [:div.card.blank (or props {})])
+(defn blank [& [props & children]]
+  (into
+    [:div.card.blank (or props {})]
+    children))
 
 (defn face-down [{:keys [stacked? on-click]} & children]
   (into

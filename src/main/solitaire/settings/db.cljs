@@ -2,4 +2,4 @@
   (:require [solitaire.settings.subs]))
 
 (def db
-  {:num-cards 3})
+  {:num-cards 1})

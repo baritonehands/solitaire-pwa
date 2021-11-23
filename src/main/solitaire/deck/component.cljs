@@ -15,37 +15,63 @@
            {:on-click #(dispatch [:deck/draw])}]])
 
 (defn waste-view [{:keys [waste]}]
-  [box
-   :size "2"
-   :child
-   (if (empty? waste)
-     [card/blank]
-     (let [cards (take-last 3 waste)]
-       [h-box
-        :children
-        (for [[idx card] (map-indexed vector cards)
-              :let [size (count cards)
-                    hz-stacked? (< idx (dec size))]]
-          [box
-           :child [card/face-up (cond-> {:card        card
-                                         :hz-stacked? hz-stacked?}
-                                        (= idx (dec size)) (assoc
-                                                             :on-drag-start [:deck/drag-start {:path [:waste]}]
-                                                             :on-drag-end [:deck/drag-end]))]])]))])
+  (let [{dragging-path :path} @(subscribe [:deck/dragging])
+        drag-source? (= [:waste] dragging-path)]
+    [box
+     :size "2"
+     :child
+     (if (empty? waste)
+       [card/blank]
+       (let [cards (take-last 3 waste)
+             size (count cards)
+             children (for [[idx card] (map-indexed vector cards)
+                            :let [hz-stacked? (< idx
+                                                 (if drag-source?
+                                                   (- size 2)
+                                                   (dec size)))]]
+                        [box
+                         :child [card/face-up (cond-> {:card        card
+                                                       :hz-stacked? hz-stacked?
+                                                       :hidden?     (and (= idx (dec size)) drag-source?)}
+                                                      (= idx (dec size)) (assoc
+                                                                           :on-drag-start [:deck/drag-start {:path [:waste]}]
+                                                                           :on-drag-end [:deck/drag-end]))]])]
+         [h-box
+          :children
+          (if (and drag-source? (= size 1))
+            (cons [card/blank] children)
+            children)]))]))
 
 (defn foundations-view [{:keys [foundations]}]
-  [h-box
-   :size "4"
-   :gap "5px"
-   :children
-   (for [idx (range 0 4)
-         :let [suit (get deck/suits idx)
-               component (if-let [card (-> foundations (get idx) last)]
-                           [card/face-up {:card          card
-                                          :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
-                                          :on-drag-end   [:deck/drag-end]}]
-                           [card/blank {:className (.toLowerCase suit)}])]]
-     [drag/target [:foundations idx] :size "1" :child component])])
+  (let [{dragging-path :path} @(subscribe [:deck/dragging])]
+    [h-box
+     :size "4"
+     :gap "5px"
+     :children
+     (for [idx (range 0 4)
+           :let [suit (get deck/suits idx)
+                 drag-source? (= [:foundations idx] dragging-path)
+                 card (-> foundations (get idx) last)
+                 behind (-> foundations (get idx) butlast last)
+                 blank-component [card/blank {:className (.toLowerCase suit)}]
+                 component (if (nil? card)
+                             blank-component
+                             [card/face-up {:card          card
+                                            :hidden?       drag-source?
+                                            :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
+                                            :on-drag-end   [:deck/drag-end]}])]]
+       (if (nil? card)
+         [drag/target [:foundations idx] :size "1" :child component]
+         [h-box
+          :size "1"
+          :class "foundation-stack"
+          :children
+          [[box
+            :child (if (nil? behind)
+                     blank-component
+                     [card/face-up {:card behind}])]
+           [drag/target [:foundations idx] :size "1" :child component]]]))]))
+
 
 (defn tableau-view [{:keys [tableau]}]
   (let [dragging @(subscribe [:deck/dragging])]

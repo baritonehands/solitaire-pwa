@@ -106,3 +106,16 @@ body {
 .hidden {
   visibility: hidden;
 }
+
+.foundation-stack {
+  position: relative;
+}
+
+.foundation-stack > * {
+  width: 150px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
