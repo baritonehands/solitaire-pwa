@@ -52,7 +52,7 @@
          [box
           :size "none"
           :child [button
-                  :label "Reset"
+                  :label "New Game"
                   :on-click (fn [_]
                               (undo/clear-history!)
                               (dispatch [:game/initialize]))]]]]
@@ -64,5 +64,5 @@
 
 (defn main []
   (register-worker)
-  (dispatch-sync [:game/initialize])
+  (dispatch-sync [:game/initialize :storage])
   (rdom/render [app-component] (.getElementById js/document "app-container")))

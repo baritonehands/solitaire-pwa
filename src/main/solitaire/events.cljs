@@ -1,4 +1,17 @@
 (ns solitaire.events
-  (:require [solitaire.deck.events]
+  (:require [akiroz.re-frame.storage :as storage]
+            [day8.re-frame.undo :as undo]
+            [solitaire.undo-storage]
+            [solitaire.deck.events]
             [solitaire.game.events]
             [solitaire.drag.events]))
+
+(storage/reg-co-fx! :solitaire {:fx   :storage
+                                :cofx :storage})
+
+(undo/undo-config!
+  {:max-undos 2000
+   :harvest-fn #(-> % deref (select-keys [:deck]))
+   :reinstate-fn (fn [ratom value]
+                   (swap! ratom merge value))})
+

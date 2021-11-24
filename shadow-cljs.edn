@@ -8,7 +8,8 @@
  [[reagent "1.1.0"]
   [re-com "2.13.2"]
   [re-frame "1.2.0"]
-  [day8.re-frame/undo "0.3.3"]]
+  [day8.re-frame/undo "0.3.3"]
+  [akiroz.re-frame/storage "0.1.4"]]
 
  :dev-http
  {7777 "pwa"}

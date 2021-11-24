@@ -1,10 +1,14 @@
 (ns solitaire.deck.events
   (:require [re-frame.core :refer [path trim-v reg-event-db reg-event-fx]]
+            [akiroz.re-frame.storage :as storage]
             [day8.re-frame.undo :refer [undoable]]
+            [solitaire.undo-storage :as undo-storage]
             [solitaire.deck :as deck]
             [solitaire.deck.rules :as rules]))
 
 (def deck-path (path :deck))
+(def persist-deck (storage/persist-db-keys :solitaire [:deck :settings]))
+(def persist-undo (undo-storage/persist-undo))
 
 (def tableau-size (reduce + (range 1 8)))
 
@@ -12,8 +16,10 @@
   (let [source (deck/create)
         tableau-source (take tableau-size source)
         stock (vec (drop tableau-size source))]
-    (merge
+    (update
       db
+      :deck
+      merge
       {:stock       stock
        :waste       []
        :foundations (vec (repeat 4 []))
@@ -30,12 +36,12 @@
 
 (reg-event-db
   :deck/deal
-  [deck-path trim-v]
+  [trim-v persist-deck persist-undo]
   deal-impl)
 
 (reg-event-db
   :deck/draw
-  [trim-v (undoable "draw card")]                           ; Note no deck-path
+  [trim-v persist-deck persist-undo (undoable "draw card")] ; Note no deck-path
   (fn [{:keys [settings] :as db} _]
     (update
       db
@@ -56,11 +62,11 @@
 
 (reg-event-db
   :deck/draw-tableau
-  [deck-path trim-v (undoable "draw tableau")]
-  (fn [deck [pile]]
+  [trim-v persist-deck persist-undo (undoable "draw tableau")]
+  (fn [db [pile]]
     (update-in
-      deck
-      [:tableau pile]
+      db
+      [:deck :tableau pile]
       (fn [tableau]
         (if-let [card (last (:down tableau))]
           {:down (butlast (:down tableau))
@@ -127,20 +133,21 @@
                            (rules/legal-target? (first cards) deck droppable))
                     droppable
                     path)]
-      {:db       (-> deck
-                     (assoc :dragging nil :droppable nil))
-       :dispatch [:deck/move-cards {:from-path path
-                                    :from-idx  idx
-                                    :to-path   to-path}]})))
+      (-> {:db (-> deck
+                   (assoc :dragging nil :droppable nil))}
+          (cond-> (not= path to-path)
+                  (assoc :dispatch [:deck/move-cards {:from-path path
+                                                      :from-idx  idx
+                                                      :to-path   to-path}]))))))
 ;(update-in (:path dragging) #(take (:idx dragging) %))
 ;(update-in to-path concat cards))})))
 
 (reg-event-db
   :deck/move-cards
-  [deck-path trim-v (undoable "move cards")]
-  (fn [deck [{:keys [from-path from-idx to-path]}]]
-    (let [cards (->> (get-in deck from-path)
+  [trim-v persist-deck persist-undo (undoable "move cards")]
+  (fn [db [{:keys [from-path from-idx to-path]}]]
+    (let [cards (->> (get-in db (cons :deck from-path))
                      (drop from-idx))]
-      (-> deck
-          (update-in from-path #(take from-idx %))
-          (update-in to-path concat cards)))))
+      (-> db
+          (update-in (cons :deck from-path) #(take from-idx %))
+          (update-in (cons :deck to-path) concat cards)))))
