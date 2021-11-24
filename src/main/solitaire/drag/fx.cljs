@@ -36,6 +36,7 @@
                     (.stopPropagation e)
                     (.preventDefault e))
           on-mouse-up (fn on-mouse-up [e]
+                        (println "drag end")
                         (events/unlisten js/document EventType.MOUSEMOVE on-move)
                         (events/unlisten js/document EventType.TOUCHMOVE on-move)
                         (events/unlisten js/document EventType.MOUSEUP on-mouse-up)

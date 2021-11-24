@@ -35,7 +35,8 @@
                                                        :hidden?     (and (= idx (dec size)) drag-source?)}
                                                       (= idx (dec size)) (assoc
                                                                            :on-drag-start [:deck/drag-start {:path [:waste]}]
-                                                                           :on-drag-end [:deck/drag-end]))]])]
+                                                                           :on-drag-end [:deck/drag-end]
+                                                                           :on-double-click [:deck/draw-shortcut [:waste]]))]])]
          [h-box
           :children
           (cons
@@ -115,23 +116,22 @@
                                  (not last?))
                       hidden? (and drag-source?
                                    (>= idx dragging-idx))]]
+            ^{:key (str "up" idx)}
             (if last?
-              ^{:key (str "up" idx)}
               [drag/target [:tableau pile :up]
                :child [card/face-up {:card            up-card
                                      :hidden?         hidden?
                                      :on-drag-start   [:deck/drag-start {:path [:tableau pile :up]}]
                                      :on-drag-end     [:deck/drag-end]
-                                     :on-double-click (fn [_]
-                                                        (println "Double Click!")
-                                                        (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]
+                                     :on-double-click [:deck/draw-shortcut [:tableau pile :up]]}]]
               [box
-               :child [card/face-up {:card          up-card
-                                     :stacked?      stacked?
-                                     :hidden?       hidden?
-                                     :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
-                                                                       :from-idx idx}]
-                                     :on-drag-end   [:deck/drag-end]}]])))])]))
+               :child [card/face-up {:card            up-card
+                                     :stacked?        stacked?
+                                     :hidden?         hidden?
+                                     :on-drag-start   [:deck/drag-start {:path     [:tableau pile :up]
+                                                                         :from-idx idx}]
+                                     :on-drag-end     [:deck/drag-end]
+                                     :on-double-click [:deck/draw-shortcut [:tableau pile :up]]}]])))])]))
 
 (defn overlay []
   (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]
@@ -144,8 +144,10 @@
              :children
              (for [[idx card] (map-indexed vector cards)
                    :let [stacked? (< idx (dec (count cards)))]]
+               ^{:key (str "overlay" idx)}
                [box
                 :child [card/face-up {:card     card
+                                      :class    "debug-overlay"
                                       :stacked? stacked?}]])]]))
 
 
