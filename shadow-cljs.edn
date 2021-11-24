@@ -7,7 +7,8 @@
  :dependencies
  [[reagent "1.1.0"]
   [re-com "2.13.2"]
-  [re-frame "1.2.0"]]
+  [re-frame "1.2.0"]
+  [day8.re-frame/undo "0.3.3"]]
 
  :dev-http
  {7777 "pwa"}

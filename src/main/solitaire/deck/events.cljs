@@ -1,5 +1,6 @@
 (ns solitaire.deck.events
-  (:require [re-frame.core :refer [path trim-v reg-event-db]]
+  (:require [re-frame.core :refer [path trim-v reg-event-db reg-event-fx]]
+            [day8.re-frame.undo :refer [undoable]]
             [solitaire.deck :as deck]
             [solitaire.deck.rules :as rules]))
 
@@ -34,7 +35,7 @@
 
 (reg-event-db
   :deck/draw
-  [trim-v]                                                  ; Note no deck-path
+  [trim-v (undoable "draw card")]                           ; Note no deck-path
   (fn [{:keys [settings] :as db} _]
     (update
       db
@@ -55,7 +56,7 @@
 
 (reg-event-db
   :deck/draw-tableau
-  [deck-path trim-v]
+  [deck-path trim-v (undoable "draw tableau")]
   (fn [deck [pile]]
     (update-in
       deck
@@ -117,16 +118,29 @@
           (update-in [:deck :dragging] assoc :pos [x y])
           (assoc-in [:deck :droppable] (droppable-target pos targets))))))
 
-(reg-event-db
+(reg-event-fx
   :deck/drag-end
   [deck-path trim-v]
-  (fn [{:keys [dragging droppable] :as deck} _]
-    (let [{:keys [cards path]} dragging
+  (fn [{{:keys [dragging droppable] :as deck} :db} _]
+    (let [{:keys [cards path idx]} dragging
           to-path (if (and droppable
                            (rules/legal-target? (first cards) deck droppable))
                     droppable
                     path)]
+      {:db       (-> deck
+                     (assoc :dragging nil :droppable nil))
+       :dispatch [:deck/move-cards {:from-path path
+                                    :from-idx  idx
+                                    :to-path   to-path}]})))
+;(update-in (:path dragging) #(take (:idx dragging) %))
+;(update-in to-path concat cards))})))
+
+(reg-event-db
+  :deck/move-cards
+  [deck-path trim-v (undoable "move cards")]
+  (fn [deck [{:keys [from-path from-idx to-path]}]]
+    (let [cards (->> (get-in deck from-path)
+                     (drop from-idx))]
       (-> deck
-          (assoc :dragging nil :droppable nil)
-          (update-in (:path dragging) #(take (:idx dragging) %))
+          (update-in from-path #(take from-idx %))
           (update-in to-path concat cards)))))
