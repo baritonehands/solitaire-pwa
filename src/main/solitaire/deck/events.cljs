@@ -98,12 +98,9 @@
                             :idx   idx
                             :pos   pos})))))
 
-(def card-width 100)
-(def card-height 150)
-
-(defn center-in-rect? [[x y] {:keys [top right bottom left]}]
-  (let [cx (+ x (/ card-width 2))
-        cy (+ y (/ card-height 2))]
+(defn center-in-rect? [[x y] {:keys [top right bottom left width height]}]
+  (let [cx (+ x (/ width 2))
+        cy (+ y (/ height 2))]
     (and (>= cx left) (<= cx right)
          (>= cy top) (<= cy bottom))))
 
