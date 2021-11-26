@@ -56,8 +56,8 @@
               :stock waste
               :waste [])
             (assoc deck
-              :stock (vec (drop to-take stock))
-              :waste (into
+              :stock (drop to-take stock)
+              :waste (concat
                        waste
                        (take to-take stock)))))))))
 
