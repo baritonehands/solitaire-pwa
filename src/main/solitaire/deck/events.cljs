@@ -7,7 +7,8 @@
             [solitaire.deck.rules :as rules]))
 
 (def deck-path (path :deck))
-(def persist-deck (storage/persist-db-keys :solitaire [:deck :settings]))
+(def persist-keys [:deck :settings])
+(def persist-deck (storage/persist-db-keys :solitaire persist-keys))
 (def persist-undo (undo-storage/persist-undo))
 
 (def tableau-size (reduce + (range 1 8)))
@@ -55,8 +56,8 @@
               :stock waste
               :waste [])
             (assoc deck
-              :stock (drop to-take stock)
-              :waste (concat
+              :stock (vec (drop to-take stock))
+              :waste (into
                        waste
                        (take to-take stock)))))))))
 
@@ -148,3 +149,9 @@
       (-> db
           (update-in (cons :deck from-path) #(take from-idx %))
           (update-in (cons :deck to-path) concat cards)))))
+
+(reg-event-fx
+  :deck/force-store
+  [persist-undo]
+  (fn [db _]
+    {:storage (select-keys db persist-keys)}))

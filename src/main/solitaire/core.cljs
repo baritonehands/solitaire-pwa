@@ -43,12 +43,16 @@
           :child [button
                   :label "Undo"
                   :disabled? (not undos?)
-                  :on-click (fn [] (dispatch [:undo]))]]
+                  :on-click (fn []
+                              (dispatch-sync [:undo])
+                              (dispatch [:deck/force-store]))]]
          [box
           :size "none"
           :child [button :label
                   "Redo" :disabled? (not redos?)
-                  :on-click (fn [] (dispatch [:redo]))]]
+                  :on-click (fn []
+                              (dispatch-sync [:redo])
+                              (dispatch [:deck/force-store]))]]
          [box
           :size "none"
           :child [button

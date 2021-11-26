@@ -7,7 +7,6 @@
   :game/initialize
   [trim-v (inject-cofx :storage) (inject-cofx :undo-storage)]
   (fn [{:keys [storage undo-storage redo-storage] :as cofx} [from]]
-    (println cofx)
     (if (and (= from :storage) storage)
       {:db         (merge-with merge app-db storage)
        :dispatch-n [[:drag/init]]

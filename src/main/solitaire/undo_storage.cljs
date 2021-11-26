@@ -1,5 +1,5 @@
 (ns solitaire.undo-storage
-  (:require [re-frame.core :refer [->interceptor reg-cofx reg-fx]]
+  (:require [re-frame.core :refer [->interceptor reg-cofx reg-event-fx reg-fx]]
             [akiroz.re-frame.storage :as storage]
             [day8.re-frame.undo :as undo]))
 
