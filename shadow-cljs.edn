@@ -30,4 +30,5 @@
                                   :depends-on #{:shared}}
                          :worker {:init-fn    solitaire.worker.core/main
                                   :depends-on #{:shared}
-                                  :web-worker true}}}}}
+                                  :web-worker true}}
+            :release    {:closure-defines {solitaire.worker.core/base-url "/solitaire"}}}}}

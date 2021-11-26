@@ -5,32 +5,36 @@
             ["workbox-precaching" :as wb-precaching]
             ["workbox-strategies" :as wb-strategies]))
 
+(goog-define base-url "")
+
 (defn destination-handler [dests]
   (fn [opts]
     (let [request (.-request opts)]
       (contains? dests (.-destination request)))))
 
 (def cache-urls
-  #js ["/"
-       "/assets/re-com/css/bootstrap.css"
-       "/assets/re-com/css/material-design-iconic-font.min.css"
-       "/assets/re-com/css/re-com.css"
-       "/assets/re-com/css/chosen-sprite.png"
-       "/assets/re-com/css/chosen-sprite@2x.png"
-       "/assets/re-com/fonts/Material-Design-Iconic-Font.eot"
-       "/assets/re-com/fonts/Material-Design-Iconic-Font.svg"
-       "/assets/re-com/fonts/Material-Design-Iconic-Font.ttf"
-       "/assets/re-com/fonts/Material-Design-Iconic-Font.woff"
-       "/assets/re-com/fonts/Material-Design-Iconic-Font.woff2"
-       "/assets/re-com/scripts/detect-element-resize.js"
-       "/assets/css/app.css"
-       "/assets/images/back.jpeg"
-       "/assets/images/clubs.svg"
-       "/assets/images/diamonds.svg"
-       "/assets/images/hearts.svg"
-       "/assets/images/spades.svg"
-       "/assets/build/app.js"
-       "/assets/build/shared.js"])
+  (->> ["/"
+        "/assets/re-com/css/bootstrap.css"
+        "/assets/re-com/css/material-design-iconic-font.min.css"
+        "/assets/re-com/css/re-com.css"
+        "/assets/re-com/css/chosen-sprite.png"
+        "/assets/re-com/css/chosen-sprite@2x.png"
+        "/assets/re-com/fonts/Material-Design-Iconic-Font.eot"
+        "/assets/re-com/fonts/Material-Design-Iconic-Font.svg"
+        "/assets/re-com/fonts/Material-Design-Iconic-Font.ttf"
+        "/assets/re-com/fonts/Material-Design-Iconic-Font.woff"
+        "/assets/re-com/fonts/Material-Design-Iconic-Font.woff2"
+        "/assets/re-com/scripts/detect-element-resize.js"
+        "/assets/css/app.css"
+        "/assets/images/back.jpeg"
+        "/assets/images/clubs.svg"
+        "/assets/images/diamonds.svg"
+        "/assets/images/hearts.svg"
+        "/assets/images/spades.svg"
+        "/assets/build/app.js"
+        "/assets/build/shared.js"]
+      (map #(str base-url %))
+      (clj->js)))
 
 (defn main []
   (.addEventListener
