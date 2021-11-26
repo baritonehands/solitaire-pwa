@@ -1,17 +1,16 @@
 (ns solitaire.worker.core
-  (:require ["workbox-routing" :as wb-routing]
+  (:require ["regenerator-runtime/runtime"]
+            ["workbox-routing" :as wb-routing]
             ["workbox-strategies" :as wb-strategies]))
 
-(defn destination-handler [dests f]
+(defn destination-handler [dests]
   (fn [opts]
     (let [request (.-request opts)]
-      (when (contains? dests (.-destination request))
-        (f)))))
+      (contains? dests (.-destination request)))))
 
 (defn main []
   (wb-routing/registerRoute
     (destination-handler
-      #{"image" "script" "style"}
-      (fn []
-        (wb-strategies/StaleWhileRevalidate.
-          #js {:cacheName "stale"})))))
+      #{"image" "script" "style"})
+    (wb-strategies/StaleWhileRevalidate.
+      #js {:cacheName "stale"})))

@@ -24,7 +24,8 @@
   :web     {:target     :browser
             :asset-path "/assets/build"
             :output-dir "pwa/assets/build"
-            :js-options {:babel-preset-config {:targets {:chrome 80}}}
+            :js-options {:babel-preset-config   {:targets {:chrome 80}}
+                         :ignore-asset-requires true}
             :modules    {:shared {:entries []}
                          :app    {:init-fn    solitaire.core/main
                                   :depends-on #{:shared}}
