@@ -55,32 +55,33 @@
 
 (def mustach-factory (DefaultMustacheFactory.))
 
-(defn render-mustache [scopes]
-  (with-open [writer (io/writer (io/file "pwa/index.html"))]
-    (let [mustache (.compile mustach-factory "templates/index.html.mustache")]
+(defn render-mustache [filename scopes]
+  (with-open [writer (io/writer (io/file "pwa" filename))]
+    (let [mustache (.compile mustach-factory (str "templates/" filename ".mustache"))]
       (-> mustache
           (.execute writer scopes)
           (.flush)))))
 
-(defn render-index [base-url]
-  (->> (for [{:keys       [output-name]
-              module-name :name} (load-manifest)]
-         [(str (name module-name) "_filename") output-name])
-       (into {"base_url" base-url})
-       (render-mustache)))
+(defn render-static-files [base-url]
+  (let [scopes (->> (for [{:keys       [output-name]
+                           module-name :name} (load-manifest)]
+                      [(str (name module-name) "_filename") output-name])
+                    (into {"base_url" base-url}))]
+    (render-mustache "index.html" scopes)
+    (render-mustache "manifest.json" scopes)))
 
 (defn dev
   {:shadow/requires-server true}
   []
   (clean)
   (shadow/watch :web)
-  (render-index ""))
+  (render-static-files ""))
 
 (defn release
   []
   (clean)
   (shadow/release :web)
-  (render-index "/solitaire"))
+  (render-static-files "/solitaire"))
 
 (defn print-sh [& args]
   (let [{:keys [out err]} (apply sh args)]

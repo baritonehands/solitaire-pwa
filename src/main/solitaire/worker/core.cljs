@@ -45,7 +45,7 @@
 
   (wb-routing/setDefaultHandler (wb-strategies/CacheFirst.))
 
-  (wb-precaching/precacheAndRoute #js [#js {:url "/"}])
+  (wb-precaching/precacheAndRoute #js [#js {:url (str base-url "/")}])
 
   (wb-routing/registerRoute
-    (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL "/"))))
+    (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL (str base-url "/")))))
