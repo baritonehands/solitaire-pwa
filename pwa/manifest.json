@@ -3,13 +3,13 @@
   "name": "io.github.baritonehands.Solitaire",
   "icons": [
     {
-      "src":"/assets/icon.png",
+      "src":"/assets/images/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     }
   ],
-  "start_url": "/?utm_source=homescreen",
-  "background_color": "#e05a47",
-  "theme_color": "#e05a47",
+  "start_url": "/solitaire/",
+  "background_color": "#008000",
+  "theme_color": "#008000",
   "display": "standalone"
 }

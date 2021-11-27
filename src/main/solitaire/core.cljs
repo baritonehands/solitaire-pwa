@@ -66,7 +66,7 @@
 (defn ^:dev/after-load force-rerender []
   (rdom/force-update-all))
 
-(defn main []
+(defn ^:export main []
   (register-worker)
   (dispatch-sync [:game/initialize :storage])
   (rdom/render [app-component] (.getElementById js/document "app-container")))

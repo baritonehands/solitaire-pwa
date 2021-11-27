@@ -1,6 +1,10 @@
 (ns solitaire.build
   (:require [clojure.java.io :as io]
-            [clojure.java.shell :refer [sh]]))
+            [clojure.java.shell :refer [sh]]
+            [clojure.tools.reader.edn :as edn]
+            [shadow.cljs.devtools.api :as shadow])
+  (:import (java.io PushbackReader PrintWriter)
+           (com.github.mustachejava DefaultMustacheFactory)))
 
 (defn copy-resource [filename]
   (let [in-path (str "public/assets/" filename)
@@ -37,10 +41,46 @@
   ;; delete the file or directory. if it it's a file, it's easily
   ;; deletable. if it's a directory, we already have deleted all its
   ;; contents with the code above (remember?)
-  (io/delete-file file))
+  (when (.exists file)
+    (io/delete-file file)))
 
 (defn clean []
   (delete-directory-recursive (io/file "pwa" "assets" "build")))
+
+(defn load-manifest []
+  (-> (io/file "pwa/assets/build/manifest.edn")
+      (io/reader)
+      (PushbackReader.)
+      (edn/read)))
+
+(def mustach-factory (DefaultMustacheFactory.))
+
+(defn render-mustache [scopes]
+  (with-open [writer (io/writer (io/file "pwa/index.html"))]
+    (let [mustache (.compile mustach-factory "templates/index.html.mustache")]
+      (-> mustache
+          (.execute writer scopes)
+          (.flush)))))
+
+(defn render-index [base-url]
+  (->> (for [{:keys       [output-name]
+              module-name :name} (load-manifest)]
+         [(str (name module-name) "_filename") output-name])
+       (into {"base_url" base-url})
+       (render-mustache)))
+
+(defn dev
+  {:shadow/requires-server true}
+  []
+  (clean)
+  (shadow/watch :web)
+  (render-index ""))
+
+(defn release
+  []
+  (clean)
+  (shadow/release :web)
+  (render-index "/solitaire"))
 
 (defn print-sh [& args]
   (let [{:keys [out err]} (apply sh args)]

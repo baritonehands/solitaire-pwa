@@ -7,11 +7,6 @@
 
 (goog-define base-url "")
 
-(defn destination-handler [dests]
-  (fn [opts]
-    (let [request (.-request opts)]
-      (contains? dests (.-destination request)))))
-
 (def cache-urls
   (->> ["/"
         "/assets/re-com/css/bootstrap.css"
@@ -31,8 +26,8 @@
         "/assets/images/diamonds.svg"
         "/assets/images/hearts.svg"
         "/assets/images/spades.svg"
-        "/assets/build/app.js"
-        "/assets/build/shared.js"]
+        "/assets/build/shared.js"
+        "/assets/build/app.js"]
       (map #(str base-url %))
       (clj->js)))
 
@@ -54,8 +49,3 @@
 
   (wb-routing/registerRoute
     (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL "/"))))
-
-  ;(wb-routing/registerRoute
-  ;  (destination-handler
-  ;    #{"image" "script" "style"})
-  ;  (wb-strategies/StaleWhileRevalidate.)))
