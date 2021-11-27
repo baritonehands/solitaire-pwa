@@ -27,7 +27,7 @@
                     "scripts/detect-element-resize.js"]]
     (copy-resource filename)))
 
-(defn delete-directory-recursive
+(defn delete-recursive
   "Recursively delete a directory."
   [^java.io.File file]
   ;; when `file` is a directory, list its entries and call this
@@ -37,7 +37,7 @@
   ;; `doseq` :)
   (when (.isDirectory file)
     (doseq [dir-file (.listFiles file)]
-      (delete-directory-recursive dir-file)))
+      (delete-recursive dir-file)))
   ;; delete the file or directory. if it it's a file, it's easily
   ;; deletable. if it's a directory, we already have deleted all its
   ;; contents with the code above (remember?)
@@ -45,10 +45,15 @@
     (io/delete-file file)))
 
 (defn clean []
-  (delete-directory-recursive (io/file "pwa" "assets" "build")))
+  (delete-recursive (io/file "pwa" "solitaire" "cljs-runtime"))
+  (delete-recursive (io/file "pwa" "solitaire" "shared.js"))
+  (delete-recursive (io/file "pwa" "solitaire" "app.js"))
+  (delete-recursive (io/file "pwa" "solitaire" "worker.js"))
+  (delete-recursive (io/file "pwa" "solitaire" "manifest.edn"))
+  (delete-recursive (io/file "pwa" "solitaire" "manifest.json")))
 
 (defn load-manifest []
-  (-> (io/file "pwa/assets/build/manifest.edn")
+  (-> (io/file "pwa/solitaire/manifest.edn")
       (io/reader)
       (PushbackReader.)
       (edn/read)))
@@ -56,7 +61,7 @@
 (def mustach-factory (DefaultMustacheFactory.))
 
 (defn render-mustache [filename scopes]
-  (with-open [writer (io/writer (io/file "pwa" filename))]
+  (with-open [writer (io/writer (io/file "pwa" "solitaire" filename))]
     (let [mustache (.compile mustach-factory (str "templates/" filename ".mustache"))]
       (-> mustache
           (.execute writer scopes)
@@ -75,7 +80,7 @@
   []
   (clean)
   (shadow/watch :web)
-  (render-static-files ""))
+  (render-static-files "/solitaire"))
 
 (defn release
   []

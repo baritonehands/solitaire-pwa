@@ -4,6 +4,7 @@
             [re-com.core :refer [box h-box v-box title button]]
             [re-frame.core :refer [dispatch dispatch-sync subscribe]]
             [day8.re-frame.undo :as undo]
+            [solitaire.config :as config]
             [solitaire.deck.component :as deck]
             [solitaire.drag :as drag]
             [solitaire.events]))
@@ -15,7 +16,7 @@
                          (..
                            js/navigator
                            -serviceWorker
-                           (register "assets/build/worker.js")
+                           (register "worker.js" #js {:scope (str config/base-url "/")})
                            (then
                              (fn [_]
                                (println "Registered!"))

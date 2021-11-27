@@ -23,12 +23,12 @@
             :output-dir "desktop/build"
             :modules    {:main {:init-fn solitaire.core/main}}}
   :web     {:target     :browser
-            :asset-path "/assets/build"
-            :output-dir "pwa/assets/build"
+            :asset-path "/solitaire"
+            :output-dir "pwa/solitaire"
             :modules    {:shared {:entries []}
                          :app    {:init-fn    solitaire.core/main
                                   :depends-on #{:shared}}
                          :worker {:init-fn    solitaire.worker.core/main
                                   :depends-on #{:shared}
                                   :web-worker true}}
-            :release    {:closure-defines {solitaire.worker.core/base-url "/solitaire"}}}}}
+            :release    {:closure-defines {solitaire.config/base-url "/solitaire"}}}}}

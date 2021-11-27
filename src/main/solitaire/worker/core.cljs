@@ -3,9 +3,8 @@
             ["workbox-core" :as wb-core]
             ["workbox-routing" :as wb-routing]
             ["workbox-precaching" :as wb-precaching]
-            ["workbox-strategies" :as wb-strategies]))
-
-(goog-define base-url "")
+            ["workbox-strategies" :as wb-strategies]
+            [solitaire.config :as config]))
 
 (def cache-urls
   (->> ["/"
@@ -26,9 +25,9 @@
         "/assets/images/diamonds.svg"
         "/assets/images/hearts.svg"
         "/assets/images/spades.svg"
-        "/assets/build/shared.js"
-        "/assets/build/app.js"]
-      (map #(str base-url %))
+        "/shared.js"
+        "/app.js"]
+      (map #(str config/base-url %))
       (clj->js)))
 
 (defn main []
@@ -45,7 +44,7 @@
 
   (wb-routing/setDefaultHandler (wb-strategies/CacheFirst.))
 
-  (wb-precaching/precacheAndRoute #js [#js {:url (str base-url "/")}])
+  (wb-precaching/precacheAndRoute #js [#js {:url (str config/base-url "/")}])
 
   (wb-routing/registerRoute
-    (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL (str base-url "/")))))
+    (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL (str config/base-url "/")))))
