@@ -44,6 +44,13 @@
                   (.open cache-name)
                   (.then #(.addAll % cache-urls))))))))
 
+  (.addEventListener
+    js/self
+    "message"
+    (fn [event]
+      (if (= (some-> event .-data .-type) "SKIP_WAITING")
+        (.skipWaiting js/self))))
+
   (wb-routing/registerRoute
     #(= (.. % -request -destination) "image")
     (wb-strategies/CacheFirst.))

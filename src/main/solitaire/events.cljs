@@ -4,7 +4,8 @@
             [solitaire.undo-storage]
             [solitaire.deck.events]
             [solitaire.game.events]
-            [solitaire.drag.events]))
+            [solitaire.drag.events]
+            [solitaire.workbox.events]))
 
 (storage/reg-co-fx! :solitaire {:fx   :storage
                                 :cofx :storage})

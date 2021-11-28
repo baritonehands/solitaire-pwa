@@ -6,23 +6,8 @@
             [day8.re-frame.undo :as undo]
             [solitaire.config :as config]
             [solitaire.deck.component :as deck]
-            [solitaire.drag :as drag]
+            [solitaire.workbox.prompt :as prompt]
             [solitaire.events]))
-
-(defn register-worker []
-  (if (js-in "serviceWorker" js/navigator)
-    (.addEventListener js/window "load"
-                       (fn []
-                         (..
-                           js/navigator
-                           -serviceWorker
-                           (register "worker.js" #js {:scope (str config/base-url "/")})
-                           (then
-                             (fn [_]
-                               (println "Registered!"))
-                             (fn [error]
-                               (println "ServiceWorker registration failed:" error))))))
-    (println "ServiceWorker is not supported")))
 
 (defn app-component []
   (let [redos? @(subscribe [:redos?])
@@ -62,12 +47,12 @@
                               (undo/clear-history!)
                               (dispatch [:game/initialize]))]]]]
        [box :size "auto" :child [deck/view]]]]
-     [deck/overlay]]))
+     [deck/overlay]
+     [prompt/view]]))
 
 (defn ^:dev/after-load force-rerender []
   (rdom/force-update-all))
 
 (defn ^:export main []
-  (register-worker)
   (dispatch-sync [:game/initialize :storage])
   (rdom/render [app-component] (.getElementById js/document "app-container")))

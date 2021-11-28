@@ -9,9 +9,11 @@
   (fn [{:keys [storage undo-storage redo-storage] :as cofx} [from]]
     (if (and (= from :storage) storage)
       {:db         (merge-with merge app-db storage)
-       :dispatch-n [[:drag/init]]
+       :dispatch-n [[:workbox/init]
+                    [:drag/init]]
        :undo/reset [undo-storage redo-storage]}
       {:db         app-db
-       :dispatch-n [[:drag/init]
+       :dispatch-n [[:workbox/init]
+                    [:drag/init]
                     [:deck/deal]]})))
 
