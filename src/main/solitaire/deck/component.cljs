@@ -16,32 +16,29 @@
 
 (defn waste-view [{:keys [waste]}]
   (let [{dragging-path :path} @(subscribe [:deck/dragging])
-        drag-source? (= [:waste] dragging-path)]
-    [box
+        drag-source? (= [:waste] dragging-path)
+        size (count waste)
+        idx (dec size)
+        [behind card] (if (>= (count waste) 2)
+                        (take-last 2 waste)
+                        [nil (last waste)])]
+    [h-box
      :size "2"
-     :child
-     (if (empty? waste)
-       [card/blank]
-       (let [cards (take-last 3 waste)
-             size (count cards)
-             children (for [[idx card] (map-indexed vector cards)
-                            :let [hz-stacked? (< idx
-                                                 (if drag-source?
-                                                   (- size 2)
-                                                   (dec size)))]]
-                        [box
-                         :child [card/face-up (cond-> {:card        card
-                                                       :hz-stacked? hz-stacked?
-                                                       :hidden?     (and (= idx (dec size)) drag-source?)}
-                                                      (= idx (dec size)) (assoc
-                                                                           :on-drag-start [:deck/drag-start {:path [:waste]}]
-                                                                           :on-drag-end [:deck/drag-end]))]])]
-         [h-box
-          :children
-          (cons
-            (if (and drag-source? (= size 1))
-              [card/blank])
-            children)]))]))
+     :class "foundation-stack"
+     :children
+     [[box
+       :size "1"
+       :child (if (some? behind)
+                [card/face-up {:card behind}]
+                [card/blank])]
+      (if (some? card)
+        [box
+         :child
+         [card/face-up (cond-> {:card        card
+                                :hidden?     (and (= idx (dec size)) drag-source?)}
+                               (= idx (dec size)) (assoc
+                                                    :on-drag-start [:deck/drag-start {:path [:waste]}]
+                                                    :on-drag-end [:deck/drag-end]))]])]]))
 
 (defn foundations-view [{:keys [foundations]}]
   (let [{dragging-path :path} @(subscribe [:deck/dragging])]
@@ -83,55 +80,52 @@
            :let [{dragging-path  :path
                   dragging-cards :cards
                   dragging-idx   :idx} dragging
-                 drag-source? (= [:tableau pile :up] dragging-path)]]
-       [v-box
-        :size "1 0 auto"
-        :children
-        (concat
-          [(if (and (empty? down)
-                    (or
-                      (empty? up)
-                      (and drag-source? (= (count up) (count dragging-cards)))))
-             ^{:key "empty"}
-             [drag/target [:tableau pile :up]
-              :child [card/blank]])]
-          (for [[idx _] (map-indexed vector down)
-                :let [last? (and (empty? up)
-                                 (= idx (dec (count down))))
-                      stacked? (or (< idx (dec (count down)))
-                                   (if drag-source?
-                                     (< (count dragging-cards) (count up))
-                                     (seq up)))]]
-            (if last?
-              ^{:key (str "down" idx)}
-              [drag/target [:tableau pile :down]
-               :child [card/face-down {:on-click #(dispatch [:deck/draw-tableau pile])}]]
-              [box
-               :child [card/face-down {:stacked? stacked?}]]))
-          (for [[idx up-card] (map-indexed vector up)
-                :let [last? (= idx (dec (count up)))
-                      stacked? (if drag-source?
-                                 (< idx (dec dragging-idx))
-                                 (not last?))
-                      hidden? (and drag-source?
-                                   (>= idx dragging-idx))]]
-            (if last?
-              ^{:key (str "up" idx)}
-              [drag/target [:tableau pile :up]
-               :child [card/face-up {:card            up-card
-                                     :hidden?         hidden?
-                                     :on-drag-start   [:deck/drag-start {:path [:tableau pile :up]}]
-                                     :on-drag-end     [:deck/drag-end]
-                                     :on-double-click (fn [_]
-                                                        (println "Double Click!")
-                                                        (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]
-              [box
-               :child [card/face-up {:card          up-card
-                                     :stacked?      stacked?
-                                     :hidden?       hidden?
-                                     :on-drag-start [:deck/drag-start {:path     [:tableau pile :up]
-                                                                       :from-idx idx}]
-                                     :on-drag-end   [:deck/drag-end]}]])))])]))
+                 drag-source? (= [:tableau pile :up] dragging-path)
+                 stack [v-box
+                        :children
+                        (concat
+                          [(if (and (empty? down)
+                                    (or
+                                      (empty? up)
+                                      (and drag-source? (= (count up) (count dragging-cards)))))
+                             ^{:key "empty"}
+                             [box
+                              :child [card/blank]])]
+                          (for [[idx _] (map-indexed vector down)
+                                :let [last? (and (empty? up)
+                                                 (= idx (dec (count down))))
+                                      stacked? (or (< idx (dec (count down)))
+                                                   (if drag-source?
+                                                     (< (count dragging-cards) (count up))
+                                                     (seq up)))]]
+                            ^{:key (str "down" idx)}
+                            [box
+                             :child [card/face-down {:stacked? stacked?
+                                                     :on-click #(dispatch [:deck/draw-tableau pile])}]])
+                          (for [[idx up-card] (map-indexed vector up)
+                                :let [last? (= idx (dec (count up)))
+                                      stacked? (if drag-source?
+                                                 (< idx (dec dragging-idx))
+                                                 (not last?))
+                                      hidden? (and drag-source?
+                                                   (>= idx dragging-idx))]]
+                            [box
+                             :child [card/face-up {:card            up-card
+                                                   :stacked?        stacked?
+                                                   :hidden?         hidden?
+                                                   :on-drag-start   [:deck/drag-start {:path     [:tableau pile :up]
+                                                                                       :from-idx idx}]
+                                                   :on-drag-end     [:deck/drag-end]
+                                                   :on-double-click (fn [_]
+                                                                      (println "Double Click!")
+                                                                      (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]))]]]
+       (if (empty? up)
+         [box
+          :size "1 0 auto"
+          :child stack]
+         [drag/target [:tableau pile :up]
+          :size "1 0 auto"
+          :child stack]))]))
 
 (defn overlay []
   (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]
