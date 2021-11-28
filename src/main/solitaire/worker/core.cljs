@@ -25,6 +25,8 @@
         "/assets/images/diamonds.svg"
         "/assets/images/hearts.svg"
         "/assets/images/spades.svg"
+        "/assets/images/icon192.png"
+        "/assets/images/icon512.png"
         "/shared.js"
         "/app.js"]
       (map #(str config/base-url %))
@@ -42,9 +44,13 @@
                   (.open cache-name)
                   (.then #(.addAll % cache-urls))))))))
 
-  (wb-routing/setDefaultHandler (wb-strategies/CacheFirst.))
+  (wb-routing/registerRoute
+    #(= (.. % -request -destination) "image")
+    (wb-strategies/CacheFirst.))
 
-  (wb-precaching/precacheAndRoute #js [#js {:url (str config/base-url "/")}])
+  (wb-routing/setDefaultHandler (wb-strategies/StaleWhileRevalidate.))
+
+  (wb-precaching/precacheAndRoute #js [#js {:url (str config/base-url "/") :revision config/revision-hash}])
 
   (wb-routing/registerRoute
     (wb-routing/NavigationRoute. (wb-precaching/createHandlerBoundToURL (str config/base-url "/")))))

@@ -2,7 +2,8 @@
   (:require [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [clojure.tools.reader.edn :as edn]
-            [shadow.cljs.devtools.api :as shadow])
+            [shadow.cljs.devtools.api :as shadow]
+            [clojure.string :as str])
   (:import (java.io PushbackReader PrintWriter)
            (com.github.mustachejava DefaultMustacheFactory)))
 
@@ -85,7 +86,10 @@
 (defn release
   []
   (clean)
-  (shadow/release :web)
+  (shadow/release
+    :web
+    {:config-merge
+     [{:closure-defines {'solitaire.config/revision-hash (str/trim-newline (slurp "manifest.uuid"))}}]})
   (render-static-files "/solitaire"))
 
 (defn print-sh [& args]
