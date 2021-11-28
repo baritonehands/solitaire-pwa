@@ -9,6 +9,7 @@
 (defn stock-view [{:keys [stock]}]
   [box
    :size "1"
+   :justify :center
    :child [(if (empty? stock)
              card/blank
              card/face-down)
@@ -28,14 +29,16 @@
      :children
      [[box
        :size "1"
+       :justify :center
        :child (if (some? behind)
                 [card/face-up {:card behind}]
                 [card/blank])]
       (if (some? card)
         [box
+         :justify :center
          :child
-         [card/face-up (cond-> {:card        card
-                                :hidden?     (and (= idx (dec size)) drag-source?)}
+         [card/face-up (cond-> {:card    card
+                                :hidden? (and (= idx (dec size)) drag-source?)}
                                (= idx (dec size)) (assoc
                                                     :on-drag-start [:deck/drag-start {:path [:waste]}]
                                                     :on-drag-end [:deck/drag-end]))]])]]))
@@ -44,7 +47,7 @@
   (let [{dragging-path :path} @(subscribe [:deck/dragging])]
     [h-box
      :size "4"
-     :gap "5px"
+     :justify :between
      :children
      (for [idx (range 0 4)
            :let [suit (get deck/suits idx)
@@ -59,22 +62,30 @@
                                             :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
                                             :on-drag-end   [:deck/drag-end]}])]]
        (if (nil? card)
-         [drag/target [:foundations idx] :size "1" :child component]
+         [drag/target [:foundations idx]
+          :size "1"
+          :justify :center
+          :child component]
          [h-box
           :size "1"
           :class "foundation-stack"
           :children
           [[box
+            :size "1"
+            :justify :center
             :child (if (nil? behind)
                      blank-component
                      [card/face-up {:card behind}])]
-           [drag/target [:foundations idx] :size "1" :child component]]]))]))
+           [drag/target [:foundations idx]
+            :size "1"
+            :justify :center
+            :child component]]]))]))
 
 
 (defn tableau-view [{:keys [tableau]}]
   (let [dragging @(subscribe [:deck/dragging])]
     [h-box
-     :gap "5px"
+     :justify :between
      :children
      (for [[pile {:keys [down up]}] (map-indexed vector tableau)
            :let [{dragging-path  :path
@@ -101,7 +112,8 @@
                             ^{:key (str "down" idx)}
                             [box
                              :child [card/face-down {:stacked? stacked?
-                                                     :on-click #(dispatch [:deck/draw-tableau pile])}]])
+                                                     :on-click (if last?
+                                                                 #(dispatch [:deck/draw-tableau pile]))}]])
                           (for [[idx up-card] (map-indexed vector up)
                                 :let [last? (= idx (dec (count up)))
                                       stacked? (if drag-source?
@@ -119,13 +131,10 @@
                                                    :on-double-click (fn [_]
                                                                       (println "Double Click!")
                                                                       (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]))]]]
-       (if (empty? up)
-         [box
-          :size "1 0 auto"
-          :child stack]
-         [drag/target [:tableau pile :up]
-          :size "1 0 auto"
-          :child stack]))]))
+       [drag/target [:tableau pile :up]
+        :size "1 0 auto"
+        :justify :center
+        :child stack])]))
 
 (defn overlay []
   (if-let [{:keys [cards pos]} @(subscribe [:deck/dragging])]
@@ -152,7 +161,7 @@
      :children
      [[h-box
        :size "auto"
-       :gap "5px"
+       :justify :between
        :children
        [[stock-view {:stock stock}]
         [waste-view {:waste waste}]

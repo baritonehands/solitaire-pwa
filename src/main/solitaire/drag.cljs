@@ -38,19 +38,20 @@
                                           (js->clj :keywordize-keys true))]
                            (dispatch [:drag/set-target path bounds])))
                _ (.addEventListener js/window "resize" handler)]
-              (-> args
-                  (cond-> (= @*hover path) (assoc :class "droppable"))
-                  (dissoc :child)
-                  (->> (reduce
-                         concat
-                         [box :child [:div {:ref (fn [elem]
-                                                   (when elem
-                                                     (reset! *elem elem)
-                                                     (handler #js {})))}
-                                      child]]))
-                  (vec))
-              (finally
-                (.removeEventListener js/window "resize" handler)
-                (dispatch [:drag/remove-target path]))))
+    (-> args
+        (cond-> (= @*hover path) (assoc :class "droppable"))
+        (dissoc :child)
+        (->> (reduce
+               concat
+               [box
+                :attr {:ref (fn [elem]
+                              (when elem
+                                (reset! *elem elem)
+                                (handler #js {})))}
+                :child child]))
+        (vec))
+    (finally
+      (.removeEventListener js/window "resize" handler)
+      (dispatch [:drag/remove-target path]))))
 
 
