@@ -75,6 +75,19 @@ body {
     height: 12px;
 }
 
+.foundation-stack {
+    position: relative;
+}
+
+.foundation-stack > * {
+    width: 150px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
 @media (max-width: 725px) {
     #app-container {
         max-width: 725px;
@@ -89,6 +102,10 @@ body {
         font-size: 10px;
         background-position: 13px 23px;
         background-size: 16px 16px;
+    }
+
+    .foundation-stack > * {
+        width: 45px;
     }
 
     .back {
@@ -157,17 +174,4 @@ body {
 
 .hidden {
     visibility: hidden;
-}
-
-.foundation-stack {
-    position: relative;
-}
-
-.foundation-stack > * {
-    width: 150px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
 }
