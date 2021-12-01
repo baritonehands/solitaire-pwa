@@ -8,7 +8,12 @@
 
 ## Run Dev Build
 
-    shadow-cljs start
-    shadow-cljs watch web
+    shadow-cljs run solitaire.build/dev
+
+Navigate to:
 
     https://localhost:7777
+
+## Run Release Build
+
+    shadow-cljs run solitaire.build/release

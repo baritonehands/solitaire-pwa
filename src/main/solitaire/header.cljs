@@ -11,6 +11,10 @@
         (mapcat identity)
         (into [md-icon-button]))))
 
+(defn new-game []
+  (undo/clear-history!)
+  (dispatch [:game/initialize]))
+
 (defn view []
   (let [redos? @(subscribe [:redos?])
         undos? @(subscribe [:undos?])]
@@ -34,8 +38,12 @@
                        [:i {:className   "zmdi zmdi-plus"
                             :font-weight "bold"}]]
                :on-click (fn [_]
-                           (undo/clear-history!)
-                           (dispatch [:game/initialize]))]]
+                           (dispatch [:dialog/confirm
+                                      {:title         "Game in Progress"
+                                       :text          "Would you like to start a new game?"
+                                       :confirm-label "New Game"
+                                       :cancel-label  "Cancel"
+                                       :on-confirm    new-game}]))]]
       [h-box
        :size "1"
        :justify :end

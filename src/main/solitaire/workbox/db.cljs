@@ -1,6 +1,4 @@
-(ns solitaire.workbox.db
-  (:require [solitaire.workbox.subs]))
+(ns solitaire.workbox.db)
 
 (def db
-  {:instance     nil
-   :show-prompt? false})
+  {:instance nil})

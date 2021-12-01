@@ -5,7 +5,8 @@
             [solitaire.deck.events]
             [solitaire.game.events]
             [solitaire.drag.events]
-            [solitaire.workbox.events]))
+            [solitaire.workbox.events]
+            [solitaire.dialog.events]))
 
 (storage/reg-co-fx! :solitaire {:fx   :storage
                                 :cofx :storage})
