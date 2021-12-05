@@ -1,5 +1,6 @@
 (ns solitaire.deck.component
-  (:require [re-frame.core :refer [subscribe dispatch]]
+  (:require [reagent.core :as r]
+            [re-frame.core :refer [subscribe dispatch]]
             [re-com.core :refer [box h-box v-box label]]
             [solitaire.components.card :as card]
             [solitaire.drag :as drag]
@@ -55,13 +56,16 @@
                  card (-> foundations (get idx) last)
                  behind (-> foundations (get idx) butlast last)
                  blank-component [card/blank {:className (.toLowerCase suit)}]
-                 component (if (nil? card)
-                             blank-component
-                             [card/face-up {:card          card
-                                            :hidden?       drag-source?
-                                            :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
-                                            :on-drag-end   [:deck/drag-end]}])]]
+                 component [box
+                            :child
+                            (if (nil? card)
+                              blank-component
+                              [card/face-up {:card          card
+                                             :hidden?       drag-source?
+                                             :on-drag-start [:deck/drag-start {:path [:foundations idx]}]
+                                             :on-drag-end   [:deck/drag-end]}])]]]
        (if (nil? card)
+         ^{:key (str "empty" idx)}
          [drag/target [:foundations idx]
           :size "1"
           :justify :center
@@ -76,6 +80,7 @@
             :child (if (nil? behind)
                      blank-component
                      [card/face-up {:card behind}])]
+           ^{:key (str "stacked" idx)}
            [drag/target [:foundations idx]
             :size "1"
             :justify :center
@@ -86,6 +91,7 @@
   (let [dragging @(subscribe [:deck/dragging])]
     [h-box
      :justify :between
+     :align :start
      :children
      (for [[pile {:keys [down up]}] (map-indexed vector tableau)
            :let [{dragging-path  :path
@@ -150,7 +156,6 @@
                [box
                 :child [card/face-up {:card     card
                                       :stacked? stacked?}]])]]))
-
 
 (defn view []
   (let [{:keys [stock waste foundations tableau]} @(subscribe [:deck])]

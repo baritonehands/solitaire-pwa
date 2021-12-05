@@ -3,12 +3,14 @@
             [re-com.core :refer [box h-box v-box title button]]
             [re-frame.core :refer [dispatch dispatch-sync subscribe]]
             [solitaire.deck.component :as deck]
+            [solitaire.drag.components :as drag]
             [solitaire.dialog.confirm :as confirm]
             [solitaire.header :as header]
             [solitaire.events]))
 
 (defn app-component []
   [:<>
+   [drag/debug-underlay]
    [v-box
     :style {:position "relative"}
     :children

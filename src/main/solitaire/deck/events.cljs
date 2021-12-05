@@ -99,8 +99,13 @@
                             :idx   idx
                             :pos   pos})))))
 
-(defn center-in-rect? [[x y] {:keys [top right bottom left width height]}]
-  (let [cx (+ x (/ width 2))
+(defn mobile? []
+  (.-matches (.matchMedia js/window "(max-width: 725px)")))
+
+(defn center-in-rect? [[x y] {:keys [top right bottom left]}]
+  (let [width (if (mobile?) 45 100)
+        height (if (mobile?) 60 150)
+        cx (+ x (/ width 2))
         cy (+ y (/ height 2))]
     (and (>= cx left) (<= cx right)
          (>= cy top) (<= cy bottom))))
@@ -108,7 +113,8 @@
 (defn droppable-target [[x y] targets]
   (->> (for [[path dims] targets
              :when (center-in-rect? [(- x js/window.scrollX)
-                                     (- y js/window.scrollY)] dims)]
+                                     (- y js/window.scrollY)]
+                                    dims)]
          path)
        (first)))
 
@@ -116,11 +122,10 @@
   :deck/drag-move
   [trim-v]                                                  ; Needs drag path too
   (fn [{:keys [deck drag] :as db} [x y]]
-    (let [{{:keys [cards path pos]} :dragging} deck
-          {:keys [targets]} drag]
+    (let [{:keys [targets]} drag]
       (-> db
           (update-in [:deck :dragging] assoc :pos [x y])
-          (assoc-in [:deck :droppable] (droppable-target pos targets))))))
+          (assoc-in [:deck :droppable] (droppable-target [x y] targets))))))
 
 (reg-event-fx
   :deck/drag-end
@@ -137,8 +142,6 @@
                   (assoc :dispatch [:deck/move-cards {:from-path path
                                                       :from-idx  idx
                                                       :to-path   to-path}]))))))
-;(update-in (:path dragging) #(take (:idx dragging) %))
-;(update-in to-path concat cards))})))
 
 (reg-event-db
   :deck/move-cards

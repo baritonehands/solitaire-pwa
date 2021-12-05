@@ -5,8 +5,8 @@
             [re-frame.core :refer [dispatch subscribe]]))
 
 (defn mouse-down-handler
-  ([*elem event] (mouse-down-handler event {:invert? false
-                                            :scale   1}))
+  ([*elem event] (mouse-down-handler *elem event {:invert? false
+                                                  :scale   1}))
   ([*elem event opts]
    (fn [e]
      (when (and
@@ -38,18 +38,20 @@
                                           (js->clj :keywordize-keys true))]
                            (dispatch [:drag/set-target path bounds])))
                _ (.addEventListener js/window "resize" handler)]
-    (-> args
-        (cond-> (= @*hover path) (assoc :class "droppable"))
-        (dissoc :child)
-        (->> (reduce
-               concat
-               [box
-                :attr {:ref (fn [elem]
-                              (when elem
-                                (reset! *elem elem)
-                                (handler #js {})))}
-                :child child]))
-        (vec))
+              (-> args
+                  (cond-> (= @*hover path) (assoc :class "droppable"))
+                  (dissoc :child)
+                  (->> (reduce
+                         concat
+                         [box
+                          :size "none"
+                          :child (into
+                                   child
+                                   [:attr {:ref (fn [elem]
+                                                  (when elem
+                                                    (reset! *elem elem)
+                                                    (handler #js {})))}])]))
+                  (vec))
     (finally
       (.removeEventListener js/window "resize" handler)
       (dispatch [:drag/remove-target path]))))

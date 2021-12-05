@@ -172,6 +172,20 @@ body {
     position: absolute;
 }
 
+.debug-underlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.drag-target {
+    position: absolute;
+    border: 1px dotted red;
+    color: red;
+}
+
 .hidden {
     visibility: hidden;
 }

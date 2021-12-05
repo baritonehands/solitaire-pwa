@@ -29,7 +29,7 @@
 
 (reg-fx
   :drag.fx/start
-  (fn [{:keys [offset start event opts]}]
+  (fn [{:keys [offset start dims event opts]}]
     (let [{:keys [on-drag-start on-drag-end]} opts
           on-move (fn [e]
                     (event-or-fn event (new-pos offset start e opts))
@@ -47,4 +47,4 @@
       (events/listen js/document EventType.MOUSEUP on-mouse-up)
       (events/listen js/document EventType.TOUCHEND on-mouse-up)
       (if on-drag-start
-        (dispatch (conj on-drag-start start))))))
+        (dispatch (conj on-drag-start start dims))))))

@@ -1,4 +1,5 @@
-(ns solitaire.drag.db)
+(ns solitaire.drag.db
+  (:require [solitaire.drag.subs]))
 
 (def db
   {:targets {}})
