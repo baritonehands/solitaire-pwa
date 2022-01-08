@@ -1,6 +1,5 @@
 (ns solitaire.game.events
   (:require [re-frame.core :refer [trim-v reg-event-fx inject-cofx]]
-            [akiroz.re-frame.storage :as storage]
             [solitaire.game.db :refer [app-db]]))
 
 (reg-event-fx

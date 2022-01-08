@@ -6,6 +6,7 @@
             [solitaire.drag.components :as drag]
             [solitaire.dialog.confirm :as confirm]
             [solitaire.header :as header]
+            [solitaire.footer :as footer]
             [solitaire.events]))
 
 (defn app-component []
@@ -15,7 +16,8 @@
     :style {:position "relative"}
     :children
     [[header/view]
-     [box :size "auto" :child [deck/view]]]]
+     [box :size "auto" :child [deck/view]]
+     [footer/view]]]
    [deck/overlay]
    [confirm/view]])
 
