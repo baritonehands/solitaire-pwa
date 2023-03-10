@@ -8,7 +8,7 @@
   (-> {:state   (select-keys @app-db [:deck :settings])
        :storage (storage/<-store :solitaire)}
       (pr-str)
-      (base64/encodeString true)))
+      (base64/encodeString base64/Alphabet.WEBSAFE)))
 
 (defn view []
   [box
