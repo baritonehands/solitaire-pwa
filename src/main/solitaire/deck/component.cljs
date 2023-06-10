@@ -70,6 +70,7 @@
           :size "1"
           :justify :center
           :child component]
+         ^{:key (str "foundation" idx)}
          [h-box
           :size "1"
           :class "foundation-stack"
@@ -127,6 +128,7 @@
                                                  (not last?))
                                       hidden? (and drag-source?
                                                    (>= idx dragging-idx))]]
+                            ^{:key (str "up" idx)}
                             [box
                              :child [card/face-up {:card            up-card
                                                    :stacked?        stacked?
@@ -137,6 +139,7 @@
                                                    :on-double-click (fn [_]
                                                                       (println "Double Click!")
                                                                       (dispatch [:deck/draw-shortcut [:tableau pile :up]]))}]]))]]]
+       ^{:key (str "pile" pile)}
        [drag/target [:tableau pile :up]
         :size "1 0 auto"
         :justify :center
@@ -153,6 +156,7 @@
              :children
              (for [[idx card] (map-indexed vector cards)
                    :let [stacked? (< idx (dec (count cards)))]]
+               ^{:key (str "overlay" idx)}
                [box
                 :child [card/face-up {:card     card
                                       :stacked? stacked?}]])]]))

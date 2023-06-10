@@ -12,7 +12,7 @@
 
 Navigate to:
 
-    https://localhost:7777
+    https://localhost:7777/solitaire
 
 ## Run Release Build
 
